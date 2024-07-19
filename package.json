@@ -1,0 +1,30 @@
+{
+  "name": "To-do-list",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@mdi/font": "7.0.96",
+    "animate.css": "^4.1.1",
+    "axios": "^1.6.8",
+    "chart.js": "^4.4.2",
+    "js-cookie": "^3.0.5",
+    "pinia": "^2.1.7",
+    "roboto-fontface": "*",
+    "vue": "^3.2.0",
+    "vue-chartjs": "^5.3.1",
+    "vue-i18n": "^9.13.1",
+    "vue-router": "^4.0.0",
+    "vuetify": "^3.6.13-3.7.0-beta.0.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^4.0.0",
+    "unplugin-fonts": "^1.0.3",
+    "vite": "^4.2.0",
+    "vite-plugin-pwa": "^0.16.7",
+    "vite-plugin-vuetify": "^1.0.0"
+  }
+}
