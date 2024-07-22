@@ -1,14 +1,17 @@
 import apiClient from '../api/axios'; // Ajuste o caminho conforme necessário
 import { LoginData } from '../model/Login'; // Ajuste o caminho conforme necessário
 import Cookies from 'js-cookie';
+import { useAuthStore } from '@/store/authStore';
 
 const LoginService = {
-  async login(cpf: string, senha: string) {
+  async login(cpf, senha) {
     try {
-      const response = await apiClient.post('/usuario/login', { cpf, senha } as LoginData);
+      const response = await apiClient.post('/usuario/login', { cpf, senha });
       if (response.status === 200) {
-        // Armazena o token JWT no cookie
-        Cookies.set('token', response.data.token, { expires: 7 }); // O cookie expira em 7 dias
+        const token = response.data.token; // Certifique-se de que o token está vindo do backend
+        const expiresIn = 3600; // Tempo de expiração do token em segundos (2 minutos)
+        const authStore = useAuthStore();
+        authStore.logIn(token, expiresIn);
         return true;
       } else {
         throw new Error("Falha no login");
@@ -18,7 +21,7 @@ const LoginService = {
     }
   },
 
-  async resetPassword(cpf: string, novaSenha: string) {
+  async resetPassword(cpf, novaSenha) {
     try {
       const response = await apiClient.post('/usuario/redefinir-senha', { cpf, novaSenha });
       return response.data;

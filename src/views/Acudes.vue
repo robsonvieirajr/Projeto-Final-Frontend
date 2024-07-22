@@ -54,15 +54,12 @@
           </v-card-title>
           <v-card-text>
             <div class="filter-container">
-              <div class="filter-input">
-                <label for="nome">Nome</label>
-                <input type="text" id="nome" v-model="filters.nome" class="custom-input">
-              </div>
-              <div class="filter-input">
-                <label for="localizacao">Localização</label>
-                <input type="text" id="localizacao" v-model="filters.localizacao" class="custom-input">
-              </div>
-            </div>
+    <div class="filter-input">
+        <label for="nome">Nome</label>
+        <input type="text" id="nome" v-model="filters.nome"  class="custom-input-nome">
+    </div>
+</div>
+
             <div class="filter-actions">
               <v-btn class="btn-rounded btn-primary" @click="searchAcudes">Pesquisar</v-btn>
               <v-btn class="btn-rounded btn-outline" @click="clearFilters">Limpar</v-btn>
@@ -198,23 +195,25 @@ export default {
       }
     },
     async searchAcudes() {
-  this.isLoading = true; // Ativar carregamento
-  try {
-    const response = await acudeService.getAcudes();
-    this.filteredAcudes = response.objeto.filter(acude => {
-      return (
-        (!this.filters.nome || acude.nome.toLowerCase().includes(this.filters.nome.toLowerCase())) &&
-        (!this.filters.localizacao || acude.localizacao.toLowerCase().includes(this.filters.localizacao.toLowerCase()))
-      );
-    });
-    this.isSearchPerformed = true; // Marcar que a pesquisa foi realizada
-  } catch (error) {
-    console.error('Erro ao buscar açudes:', error);
-    this.isSearchPerformed = true; // Marcar que a pesquisa foi realizada
-  } finally {
-    this.isLoading = false; // Desativar carregamento
-  }
-},
+    this.isLoading = true; // Ativar carregamento
+    setTimeout(async () => { // Adiciona um atraso de 3 segundos
+      try {
+        const response = await acudeService.getAcudes();
+        this.filteredAcudes = response.objeto.filter(acude => {
+          return (
+            (!this.filters.nome || acude.nome.toLowerCase().includes(this.filters.nome.toLowerCase())) &&
+            (!this.filters.localizacao || acude.localizacao.toLowerCase().includes(this.filters.localizacao.toLowerCase()))
+          );
+        });
+        this.isSearchPerformed = true; // Marcar que a pesquisa foi realizada
+      } catch (error) {
+        console.error('Erro ao buscar açudes:', error);
+        this.isSearchPerformed = true; // Marcar que a pesquisa foi realizada
+      } finally {
+        this.isLoading = false; // Desativar carregamento
+      }
+    }, 3000); // Atraso de 3 segundos
+  },
 
     clearFilters() {
       this.filters = {

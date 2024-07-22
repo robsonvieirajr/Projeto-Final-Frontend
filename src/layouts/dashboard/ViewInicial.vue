@@ -100,9 +100,6 @@ function fazerLogoff(item) {
 const items = [
   { text: 'Home', icon: 'mdi-home', to: '/home' },
   { text: 'Acudes', icon: 'mdi-water', to: '/acudes' },
-  { text: 'Manejo', icon: 'mdi-nature-people', to: '/manejo' },
-  { text: 'Medição', icon: 'mdi-speedometer', to: '/medicao' },
-  { text: 'Sensor', icon: 'mdi mdi-leak', to: '/sensor' },
   { text: 'Sobre', icon: 'mdi-information', to: '/about' },
   { text: 'Logout', icon: 'mdi-logout', to: '/login' },
 ];
