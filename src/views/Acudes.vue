@@ -2,25 +2,44 @@
   <v-container>
     <v-row>
       <v-col>
+        <!-- Seção do cabeçalho -->
         <div class="header-container">
           <h1>Consulta de Açudes</h1>
-          <v-btn class="btn-rounded btn-primary" @click="openModal">Cadastrar Açudes</v-btn>
+          <v-btn class="btn-rounded btn-primary" @click="abrirModal"
+            >Cadastrar Açudes</v-btn
+          >
         </div>
 
         <!-- Modal para cadastrar açudes -->
-        <v-dialog v-model="dialog" max-width="600px" class="custom-dialog">
+        <v-dialog v-model="dialogo" max-width="600px" class="custom-dialog">
           <v-card class="custom-card">
-            <v-card-title class="headline custom-card-title">Cadastrar Açude</v-card-title>
+            <v-card-title class="headline custom-card-title"
+              >Cadastrar Açude</v-card-title
+            >
             <v-card-text>
-              <v-form ref="form">
+              <v-form ref="formulario">
                 <div class="modal-input-container">
                   <div class="modal-input">
                     <label for="nome">Nome</label>
-                    <input type="text" id="nome" v-model="newAcude.nome" class="custom-input" required @input="validateForm">
+                    <input
+                      type="text"
+                      id="nome"
+                      v-model="novoAcude.nome"
+                      class="custom-input"
+                      required
+                      @input="validarFormulario"
+                    />
                   </div>
                   <div class="modal-input">
                     <label for="localizacao">Localização</label>
-                    <input type="text" id="localizacao" v-model="newAcude.localizacao" class="custom-input" required @input="validateForm">
+                    <input
+                      type="text"
+                      id="localizacao"
+                      v-model="novoAcude.localizacao"
+                      class="custom-input"
+                      required
+                      @input="validarFormulario"
+                    />
                   </div>
                 </div>
                 <div class="divider"></div>
@@ -28,22 +47,43 @@
             </v-card-text>
             <v-card-actions class="custom-card-actions">
               <v-spacer></v-spacer>
-              <v-btn class="btn-rounded btn-outline" @click="closeModal">Cancelar</v-btn>
-              <v-btn :disabled="!isFormValid" class="btn-rounded btn-primary" @click="saveAcude">Salvar</v-btn>
+              <v-btn class="btn-rounded btn-outline" @click="fecharModal"
+                >Cancelar</v-btn
+              >
+              <v-btn
+                :disabled="!formularioValido"
+                class="btn-rounded btn-primary"
+                @click="salvarAcude"
+                >Salvar</v-btn
+              >
             </v-card-actions>
           </v-card>
         </v-dialog>
 
         <!-- Snackbar de sucesso -->
-        <v-snackbar v-model="successDialog" :timeout="timeout" color="success" class="centered-snackbar" top right>
+        <v-snackbar
+          v-model="dialogoSucesso"
+          :timeout="timeout"
+          color="success"
+          class="centered-snackbar"
+          top
+          right
+        >
           Açude cadastrado com sucesso!
-          <v-btn color="white" text @click="closeSuccessDialog">Fechar</v-btn>
+          <v-btn color="white" text @click="fecharDialogoSucesso">Fechar</v-btn>
         </v-snackbar>
 
         <!-- Snackbar de erro -->
-        <v-snackbar v-model="errorDialog" :timeout="timeout" color="error" class="centered-snackbar" top right>
-          {{ errorMessage }}
-          <v-btn color="white" text @click="closeErrorDialog">Fechar</v-btn>
+        <v-snackbar
+          v-model="dialogoErro"
+          :timeout="timeout"
+          color="error"
+          class="centered-snackbar"
+          top
+          right
+        >
+          {{ mensagemErro }}
+          <v-btn color="white" text @click="fecharDialogoErro">Fechar</v-btn>
         </v-snackbar>
 
         <!-- Seção de Filtros -->
@@ -54,84 +94,102 @@
           </v-card-title>
           <v-card-text>
             <div class="filter-container">
-    <div class="filter-input">
-        <label for="nome">Nome</label>
-        <input type="text" id="nome" v-model="filters.nome"  class="custom-input-nome">
-    </div>
-</div>
-
+              <div class="filter-input">
+                <label for="nome">Nome</label>
+                <input
+                  type="text"
+                  id="nome"
+                  v-model="filtros.nome"
+                  class="custom-input-nome"
+                  @keyup="pesquisarAcudes"
+                />
+              </div>
+            </div>
             <div class="filter-actions">
-              <v-btn class="btn-rounded btn-primary" @click="searchAcudes">Pesquisar</v-btn>
-              <v-btn class="btn-rounded btn-outline" @click="clearFilters">Limpar</v-btn>
+              <v-btn class="btn-rounded btn-primary" @click="pesquisarAcudes"
+                >Pesquisar</v-btn
+              >
+              <v-btn class="btn-rounded btn-outline" @click="limparFiltros"
+                >Limpar</v-btn
+              >
             </div>
           </v-card-text>
         </v-card>
 
-        <!-- Indicador de carregamento com v-progress-linear -->
-       <!-- Overlay com indicador de carregamento -->
-  <div v-if="isLoading" class="overlay">
-    <v-progress-circular
-      indeterminate
-      color="primary"
-      size="50"
-      width="5"
-    ></v-progress-circular>
-  </div>
+        <!-- Indicador de carregamento -->
+        <div v-if="carregando" class="overlay">
+          <v-progress-circular
+            indeterminate
+            color="primary"
+            size="50"
+            width="5"
+          ></v-progress-circular>
+        </div>
 
         <!-- Tabela de Resultados -->
-        <v-card v-if="isSearchPerformed && !isLoading">
+        <v-card v-if="pesquisaRealizada && !carregando">
           <v-card-title>
             <v-icon color="blue">mdi-clipboard-list</v-icon>
             Resultado da busca
           </v-card-title>
           <v-card-text>
             <v-data-table
-              :items="pagedAcudes"
+              :items="acudesPaginados"
               class="elevation-1 custom-table"
-              :items-per-page="itemsPerPage"
-              show-expand
+              :items-per-page="itensPorPagina"
               hide-default-footer
             >
-              <template v-slot:header>
-                <thead>
-                  <tr>
-                    <th>ID</th>
-                    <th>Nome</th>
-                    <th>Localização</th>
-                  </tr>
-                </thead>
-              </template>
-              <template v-slot:item="{ item }">
+              <thead>
                 <tr>
+                  <th>ID</th>
+                  <th>Nome</th>
+                  <th>Data Pedido</th>
+                  <th>Volume Morto</th>
+                  <th>Volume Acumulado</th>
+                  <th>Área de Drenagem</th>
+                  <th>Coeficiente de Tanque</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="item in acudesPaginados" :key="item.id">
                   <td>{{ item.id }}</td>
                   <td>{{ item.nome }}</td>
-                  <td>{{ item.localizacao }}</td>
+                  <td>{{ formatarData(item.dataPedido) }}</td>
+                  <td>{{ formatarNumero(item.volMorto) }}</td>
+                  <td>{{ formatarNumero(item.volAcumulado) }}</td>
+                  <td>{{ formatarNumero(item.areaDrenagem) }}</td>
+                  <td>{{ formatarNumero(item.coeficienteTanque) }}</td>
                 </tr>
-              </template>
-              <template v-slot:no-data>
-  <div class="d-flex flex-column align-center justify-center" style="height: 10px;">
-    <v-alert
-      :value="true"
-      color="transparent"
-      class="text-center" 
-    >
-      Nenhum dado encontrado.
-    </v-alert>
-  </div>
-</template>
-
-
+              </tbody>
+              <tfoot>
+                <tr v-if="!acudesPaginados.length">
+                  <td colspan="7" class="text-center">
+                    <div
+                      class="d-flex flex-column align-center justify-center"
+                      style="height: 10px"
+                    >
+                      <v-alert
+                        :value="true"
+                        color="light-blue"
+                        class="text-center"
+                        style="color: white; background-color: #e3f2fd"
+                      >
+                        Não foram encontrados registros correspondentes à
+                        pesquisa.
+                      </v-alert>
+                    </div>
+                  </td>
+                </tr>
+              </tfoot>
             </v-data-table>
           </v-card-text>
         </v-card>
 
-    
-
         <!-- Componente de Paginação -->
         <v-pagination
-          v-if="isSearchPerformed && !isLoading"
-          v-model="page"
-          :length="pageCount"
+          v-if="pesquisaRealizada && !carregando"
+          v-model="pagina"
+          :length="totalPaginas"
           total-visible="7"
           color="primary"
           class="mt-4"
@@ -142,128 +200,149 @@
 </template>
 
 <script>
-import acudeService from "@/service/AcudeService"; // Certifique-se de que o caminho está correto
+import moment from "moment";
+import numeral from "numeral";
+import acudeService from "@/service/AcudeService";
 
 export default {
-  name: 'AcudeSearch',
+  name: "AcudeSearch",
   data() {
     return {
-      dialog: false,
-      successDialog: false,
-      errorDialog: false,
-      errorMessage: '',
-      snackbarText: '',
+      dialogo: false,
+      dialogoSucesso: false,
+      dialogoErro: false,
+      mensagemErro: "",
+      textoSnackbar: "",
       timeout: 3000,
-      isFormValid: false,
-      isLoading: false, // Novo estado para controle de carregamento
-      isSearchPerformed: false, // Novo estado para controle de pesquisa
-      newAcude: {
-        nome: '',
-        localizacao: ''
+      formularioValido: false,
+      carregando: false,
+      pesquisaRealizada: false,
+      novoAcude: {
+        nome: "",
+        localizacao: "",
       },
-      acudes: [], // Lista de açudes
-      filteredAcudes: [], // Lista filtrada de açudes para pesquisa
-      filters: {
-        nome: '',
-        localizacao: ''
+      acudes: [],
+      acudesFiltrados: [],
+      filtros: {
+        nome: "",
+        localizacao: "",
       },
-      page: 1, // Controle de paginação
-      itemsPerPage: 10 // Número de itens por página
+      pagina: 1,
+      itensPorPagina: 10,
     };
   },
   computed: {
-    pageCount() {
-      return Math.ceil(this.filteredAcudes.length / this.itemsPerPage);
+    totalPaginas() {
+      return Math.ceil(this.acudesFiltrados.length / this.itensPorPagina);
     },
-    pagedAcudes() {
-      const start = (this.page - 1) * this.itemsPerPage;
-      const end = start + this.itemsPerPage;
-      return this.filteredAcudes.slice(start, end);
-    }
+    acudesPaginados() {
+      const inicio = (this.pagina - 1) * this.itensPorPagina;
+      const fim = inicio + this.itensPorPagina;
+      return this.acudesFiltrados.slice(inicio, fim);
+    },
   },
   methods: {
-    async fetchAcudes() {
+    async buscarAcudes() {
       try {
-        this.isLoading = true; // Ativar carregamento
-        const response = await acudeService.getAcudes();
-        this.acudes = response.objeto; // Ajuste conforme necessário para acessar a resposta correta
-        this.filteredAcudes = this.acudes;
-        this.isLoading = false; // Desativar carregamento
-      } catch (error) {
-        console.error('Erro ao buscar açudes:', error);
-        this.isLoading = false; // Desativar carregamento em caso de erro
+        this.carregando = true;
+        const resposta = await acudeService.listarTodosAcudes();
+        this.acudes = resposta.objeto;
+        this.acudesFiltrados = this.acudes;
+        this.carregando = false;
+      } catch (erro) {
+        console.error("Erro ao buscar açudes:", erro);
+        this.carregando = false;
       }
     },
-    async searchAcudes() {
-    this.isLoading = true; // Ativar carregamento
-    setTimeout(async () => { // Adiciona um atraso de 3 segundos
-      try {
-        const response = await acudeService.getAcudes();
-        this.filteredAcudes = response.objeto.filter(acude => {
-          return (
-            (!this.filters.nome || acude.nome.toLowerCase().includes(this.filters.nome.toLowerCase())) &&
-            (!this.filters.localizacao || acude.localizacao.toLowerCase().includes(this.filters.localizacao.toLowerCase()))
-          );
-        });
-        this.isSearchPerformed = true; // Marcar que a pesquisa foi realizada
-      } catch (error) {
-        console.error('Erro ao buscar açudes:', error);
-        this.isSearchPerformed = true; // Marcar que a pesquisa foi realizada
-      } finally {
-        this.isLoading = false; // Desativar carregamento
-      }
-    }, 3000); // Atraso de 3 segundos
-  },
-
-    clearFilters() {
-      this.filters = {
-        nome: '',
-        localizacao: ''
-      };
-      this.filteredAcudes = []; // Limpar a tabela de resultados
-      this.isSearchPerformed = false; // Marcar que a pesquisa não foi realizada
-    },
-    openModal() {
-      this.dialog = true;
-    },
-    closeModal() {
-      this.dialog = false;
-      this.newAcude = { nome: '', localizacao: '' };
-      this.isFormValid = false;
-    },
-    async saveAcude() {
-      try {
-        const response = await acudeService.createAcude(this.newAcude);
-        console.log('Resposta da criação do açude:', response);
-        if (!Array.isArray(this.acudes)) {
-          this.acudes = []; // Certifique-se de que this.acudes é um array
+    async pesquisarAcudes() {
+      this.carregando = true;
+      setTimeout(async () => {
+        try {
+          const resposta = await acudeService.listarTodosAcudes();
+          this.acudesFiltrados = resposta.objeto.filter((acude) => {
+            return (
+              (!this.filtros.nome ||
+                acude.nome
+                  .toLowerCase()
+                  .includes(this.filtros.nome.toLowerCase())) &&
+              (!this.filtros.localizacao ||
+                acude.localizacao
+                  .toLowerCase()
+                  .includes(this.filtros.localizacao.toLowerCase()))
+            );
+          });
+          this.pesquisaRealizada = true;
+        } catch (erro) {
+          console.error("Erro ao buscar açudes:", erro);
+          this.pesquisaRealizada = true;
+        } finally {
+          this.carregando = false;
         }
-        this.acudes.push(response.objeto); // Adicione o objeto correto à lista
-        this.filteredAcudes = this.acudes;
-        this.showSuccessDialog();
-        this.closeModal();
-      } catch (error) {
-        console.error('Erro ao salvar açude:', error);
-        this.errorMessage = error.message || 'Erro ao criar açude';
-        this.errorDialog = true;
+      }, 3000);
+    },
+    limparFiltros() {
+      this.filtros = {
+        nome: "",
+        localizacao: "",
+      };
+      this.acudesFiltrados = [];
+      this.pesquisaRealizada = false;
+    },
+    abrirModal() {
+      this.dialogo = true;
+    },
+    fecharModal() {
+      this.dialogo = false;
+      this.novoAcude = { nome: "", localizacao: "" };
+      this.formularioValido = false;
+    },
+    async salvarAcude() {
+      try {
+        const resposta = await acudeService.criarAcude(this.novoAcude);
+        if (!Array.isArray(this.acudes)) {
+          this.acudes = [];
+        }
+        this.acudes.push(resposta.objeto);
+        this.acudesFiltrados = this.acudes;
+        this.mostrarDialogoSucesso();
+        this.fecharModal();
+      } catch (erro) {
+        this.mensagemErro = "Erro ao cadastrar açude.";
+        this.mostrarDialogoErro();
+        console.error("Erro ao salvar açude:", erro);
       }
     },
-    validateForm() {
-      this.isFormValid = this.newAcude.nome && this.newAcude.localizacao;
-    },
-    showSuccessDialog() {
-      this.successDialog = true;
+    mostrarDialogoSucesso() {
+      this.dialogoSucesso = true;
       setTimeout(() => {
-        this.closeSuccessDialog();
-      }, 2000);
+        this.dialogoSucesso = false;
+      }, this.timeout);
     },
-    closeSuccessDialog() {
-      this.successDialog = false;
+    mostrarDialogoErro() {
+      this.dialogoErro = true;
+      setTimeout(() => {
+        this.dialogoErro = false;
+      }, this.timeout);
     },
-    closeErrorDialog() {
-      this.errorDialog = false;
-    }
-  }
+    fecharDialogoSucesso() {
+      this.dialogoSucesso = false;
+    },
+    fecharDialogoErro() {
+      this.dialogoErro = false;
+    },
+    formatarData(data) {
+      return moment(data).format("DD/MM/YYYY");
+    },
+    formatarNumero(numero) {
+      return numeral(numero).format("0,0");
+    },
+    validarFormulario() {
+      this.formularioValido = this.novoAcude.nome && this.novoAcude.localizacao;
+    },
+  },
+  mounted() {
+    this.buscarAcudes();
+  },
 };
 </script>
 

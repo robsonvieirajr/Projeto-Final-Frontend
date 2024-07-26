@@ -1,7 +1,7 @@
 // store/themeStore.js
-import { defineStore } from 'pinia';
+import { defineStore } from "pinia";
 
-export const useThemeStore = defineStore('theme', {
+export const useThemeStore = defineStore("theme", {
   state: () => ({
     darkMode: false,
   }),
