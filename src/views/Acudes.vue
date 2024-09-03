@@ -97,10 +97,6 @@
             </v-card-actions>
           </v-card>
         </v-dialog>
-
-
-
-
         <!-- Snackbar de sucesso -->
         <v-snackbar v-model="dialogoSucesso" :timeout="timeout" color="success" top right>
           Açude cadastrado com sucesso!
@@ -175,7 +171,7 @@
                     <v-icon small @click="handleClick('vazao', item)" color="blue">mdi-waves</v-icon>
                     <v-icon small @click="handleClick('evaporacao', item)" color="blue">mdi-thermometer</v-icon>
                     <div class="icon-cav" @click="handleClick('cotaAreaVolume', item)">CAV</div>
-                    <v-icon small @click="handleClick('relatorio', item)" color="blue">mdi-file-pdf-box</v-icon>
+                    <v-icon small @click="gerarRelatorio(item)" color="blue">mdi-file-pdf-box</v-icon>
                   </td>
                 </tr>
               </tbody>
@@ -202,16 +198,20 @@
     </v-row>
   </v-container>
 </template>
-
 <script>
 import moment from "moment";
 import numeral from "numeral";
 import acudeService from "@/service/AcudeService";
-import VueCal from 'vue-cal'
-import 'vue-cal/dist/vuecal.css'
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
+import BarChart from "@/components/BarChart.vue"; // Importa o componente de gráfico
+
 
 export default {
   name: "AcudeSearch",
+  components: {
+    BarChart, // Declara o componente de gráfico
+  },
   data() {
     return {
       dialogo: false,
@@ -247,6 +247,7 @@ export default {
       },
       pagina: 1,
       itensPorPagina: 10,
+      dadosDoGrafico: [], // Dados para o gráfico
     };
   },
   computed: {
@@ -383,12 +384,115 @@ export default {
       console.log("Importando dados de chuva:", this.dadosChuva);
       this.fecharModalChuva();
     },
+    async gerarRelatorio(item) {
+      this.$nextTick(async () => {
+        const doc = new jsPDF("p", "mm", "a4");
+
+        // Adiciona um cabeçalho com logo e data
+        const logoUrl = 'src/assets/aesa.png'; // URL da sua logo
+        doc.addImage(logoUrl, "PNG", 15, 15, 15, 15); // Adiciona a logo
+        doc.setFontSize(10);
+        doc.text(`Data do Relatório: ${new Date().toLocaleDateString()}`, 160, 15, { align: "right" });
+
+        // Adiciona um título com centralização e formatação
+        doc.setFontSize(18);
+        doc.setFont("helvetica", "bold");
+        doc.text("Relatório do Açude", 105, 40, { align: "center" });
+
+        // Adiciona uma linha abaixo do título
+        doc.setLineWidth(0.5);
+        doc.line(14, 45, 196, 45);
+
+        // Adiciona os dados básicos do relatório com alinhamento e espaçamento melhorados
+        doc.setFontSize(12);
+        const margemEsquerda = 20;
+        const espacamentoLinhas = 10;
+        let posY = 60;
+
+        const campos = [
+          { label: "Nome:", value: item.nome },
+          { label: "Volume Morto:", value: `${item.volumeMorto} m³` },
+          { label: "Volume Acumulado:", value: `${item.volumeAcumulado} m³` },
+          { label: "Volume Máximo:", value: `${item.volumeMaximo} m³` },
+          { label: "Drenagem:", value: `${item.drenagem} km²` },
+          { label: "Coeficiente de Tanque:", value: item.coeficienteTanque.toString() }, // Convertendo para string
+        ];
+
+        campos.forEach(campo => {
+          doc.setFont("helvetica", "bold");
+          doc.text(campo.label, margemEsquerda, posY);
+          doc.setFont("helvetica", "normal");
+          doc.text(campo.value.toString(), margemEsquerda + 50, posY); // Garantindo que seja string
+          posY += espacamentoLinhas;
+        });
+
+        // Adiciona o título do gráfico
+        posY += 15;
+        doc.setFont("helvetica", "bold");
+        doc.text("Gráfico de Medições do Açude", 105, posY, { align: "center" });
+
+        // Adiciona o gráfico manualmente
+        let chartX = 20;
+        let chartY = posY + 10;
+        let chartWidth = 150;
+        let chartHeight = 60;
+
+        const valores = [item.volumeMorto, item.volumeAcumulado, item.volumeMaximo, item.drenagem, item.coeficienteTanque];
+        const labels = ['Vol. Morto', 'Vol. Acum.', 'Vol. Máx.', 'Drenagem', 'Coef. Tanque'];
+
+        // Desenha as linhas de grade
+        let maxValue = Math.max(...valores);
+        const numLines = 5;
+        for (let i = 0; i <= numLines; i++) {
+          let lineY = chartY + (i * chartHeight / numLines);
+          let valueLabel = Math.round(maxValue - (i * maxValue / numLines));
+          doc.setLineWidth(0.1);
+          doc.setDrawColor(180); // Cor mais clara para a grade
+          doc.line(chartX, lineY, chartX + chartWidth, lineY); // Linha horizontal
+          doc.setFontSize(8);
+          doc.setTextColor(0);
+          doc.text(valueLabel.toString(), chartX - 10, lineY + 3); // Valor na linha
+        }
+
+        // Desenha as barras
+        valores.forEach((valor, index) => {
+          let barHeight = (valor / maxValue) * chartHeight;
+          let barX = chartX + (index * (chartWidth / valores.length)) + 10;
+          let barY = chartY + (chartHeight - barHeight);
+
+          // Desenha a barra
+          doc.setFillColor(0, 0, 255); // Cor da barra (azul)
+          doc.rect(barX, barY, 15, barHeight, 'F');
+
+          // Adiciona o rótulo da barra
+          doc.text(labels[index], barX + 7.5, chartY + chartHeight + 5, { align: "center" });
+          doc.text(valor.toString(), barX + 7.5, barY - 2, { align: "center" });
+        });
+
+        // Adiciona um rodapé
+        doc.setLineWidth(0.2);
+        doc.line(14, 280, 196, 280); // Linha acima do rodapé
+        doc.setFontSize(10);
+        doc.text("Relatório gerado automaticamente", 14, 285);
+        doc.text("Página 1", 196, 285, { align: "right" });
+
+        // Salva o PDF
+        doc.save(`relatorio_acude_${item.id}.pdf`);
+      });
+    },
+    prepararDadosGrafico(item) {
+      return [
+        { label: 'Volume Morto', value: item.volumeMorto },
+        { label: 'Volume Acumulado', value: item.volumeAcumulado },
+        { label: 'Volume Máximo', value: item.volumeMaximo },
+        { label: 'Drenagem', value: item.drenagem },
+        { label: 'Coeficiente de Tanque', value: item.coeficienteTanque },
+      ];
+    },
   },
   mounted() {
     this.buscarAcudes();
   },
 };
-
 </script>
-
 <style src="../assets/styles.css"></style>
