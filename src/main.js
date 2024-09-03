@@ -5,6 +5,9 @@ import { useAuthStore } from '@/store/authStore';
 import { Chart, registerables } from 'chart.js';
 import { registerPlugins } from '@/plugins';
 import router from './router'; // Ajuste o caminho conforme necessário
+import { createVuetify } from 'vuetify';
+import 'vuetify/styles';
+import { pt } from 'vuetify/locale'; // Importação correta do locale
 
 // Registra todos os componentes do Chart.js
 Chart.register(...registerables);
@@ -23,5 +26,15 @@ registerPlugins(app);
 const authStore = useAuthStore();
 authStore.checkTokenExpirationOnLoad();
 
+// Configuração do Vuetify com o locale pt-BR
+const vuetify = createVuetify({
+    locale: {
+        locale: 'pt',
+        messages: { pt },
+    },
+});
+
 // Monta a aplicação no elemento com o id 'app' no HTML
-app.use(router).mount('#app');
+app.use(router);
+app.use(vuetify);  // Adiciona o Vuetify à instância Vue
+app.mount('#app');

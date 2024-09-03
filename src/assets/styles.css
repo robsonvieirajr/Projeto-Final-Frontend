@@ -98,11 +98,13 @@ thead {
 }
 
 .centered-snackbar {
-  bottom: 50%;
-  transform: translateX(-50%);
-  left: 50%;
-  right: auto;
+  /* Remova quaisquer estilos de alinhamento central que a classe possa ter */
+  position: absolute;
+  right: 0; /* Alinha à direita */
+  top: 0;   /* Alinha ao topo */
+  margin-top: 16px; /* Ajuste o espaço a partir do topo */
 }
+
 
 .custom-filter-card {
   border-radius: 8px;
@@ -255,3 +257,26 @@ thead {
   border-radius: 4px;
   margin-left: 400px;
 }
+.icon-cav {
+  width: 19px; /* Ajuste o tamanho para ser consistente com os outros ícones */
+  height: 16px;
+  background-color: #2196F3; /* Azul consistente com outros ícones */
+  color: white;
+  display: inline-flex; /* Usar inline-flex para alinhar com outros ícones */
+  align-items: center;
+  justify-content: center;
+  font-size: 10px; /* Ajustar para que o texto fique proporcional ao ícone */
+  font-weight: bold;
+  border-radius: 4px;
+  cursor: pointer;
+  text-align: center;
+  margin-right: 5px; /* Espaçamento entre os ícones */
+  vertical-align: middle; /* Alinhamento vertical */
+}
+
+.icon-cav:hover {
+  background-color: #1976D2; /* Azul um pouco mais escuro no hover */
+}
+
+
+
