@@ -101,10 +101,9 @@ thead {
   /* Remova quaisquer estilos de alinhamento central que a classe possa ter */
   position: absolute;
   right: 0; /* Alinha à direita */
-  top: 0;   /* Alinha ao topo */
+  top: 0; /* Alinha ao topo */
   margin-top: 16px; /* Ajuste o espaço a partir do topo */
 }
-
 
 .custom-filter-card {
   border-radius: 8px;
@@ -260,7 +259,7 @@ thead {
 .icon-cav {
   width: 19px; /* Ajuste o tamanho para ser consistente com os outros ícones */
   height: 16px;
-  background-color: #2196F3; /* Azul consistente com outros ícones */
+  background-color: #2196f3; /* Azul consistente com outros ícones */
   color: white;
   display: inline-flex; /* Usar inline-flex para alinhar com outros ícones */
   align-items: center;
@@ -275,8 +274,38 @@ thead {
 }
 
 .icon-cav:hover {
-  background-color: #1976D2; /* Azul um pouco mais escuro no hover */
+  background-color: #1976d2; /* Azul um pouco mais escuro no hover */
+}
+/* Estilos para a tabela quando o tema escuro estiver ativo */
+.v-theme--dark .custom-table {
+  color: white !important; /* Cor do texto */
 }
 
+.v-theme--dark .custom-table thead th {
+  background-color: #333 !important; /* Fundo do cabeçalho da tabela no tema escuro */
+  color: white !important; /* Cor do texto no cabeçalho */
+}
 
+.v-theme--dark .custom-table tbody tr:nth-child(odd) {
+  background-color: #444 !important; /* Fundo das linhas ímpares no tema escuro */
+}
 
+.v-theme--dark .custom-table tbody tr:nth-child(even) {
+  background-color: #555 !important; /* Fundo das linhas pares no tema escuro */
+}
+
+.v-theme--dark .custom-table tbody td {
+  color: white !important; /* Cor do texto nas células da tabela */
+}
+
+.v-theme--dark .custom-table .v-icon {
+  color: white !important; /* Ícones com cor branca no tema escuro */
+}
+
+.v-theme--dark .custom-table tbody td {
+  border-bottom: 1px solid #666 !important; /* Borda entre as linhas no tema escuro */
+}
+
+.v-theme--dark .custom-table thead th {
+  border-bottom: 2px solid #555 !important; /* Borda no cabeçalho da tabela no tema escuro */
+}

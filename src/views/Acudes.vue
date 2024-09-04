@@ -135,6 +135,7 @@
         </div>
 
         <!-- Tabela de Resultados -->
+
         <v-card v-if="pesquisaRealizada && !carregando">
           <v-card-title>
             <v-icon color="blue">mdi-clipboard-list</v-icon>
@@ -166,15 +167,17 @@
                   <td class="text-right">{{ formatarNumero(item.drenagem) }}</td>
                   <td class="text-right">{{ formatarNumero(item.coeficienteTanque) }}</td>
                   <td class="text-center">
-                    <!-- Ícones de Ação -->
                     <v-icon small @click="handleClick('chuva', item)" color="blue">mdi-weather-rainy</v-icon>
                     <v-icon small @click="handleClick('vazao', item)" color="blue">mdi-waves</v-icon>
                     <v-icon small @click="handleClick('evaporacao', item)" color="blue">mdi-thermometer</v-icon>
                     <div class="icon-cav" @click="handleClick('cotaAreaVolume', item)">CAV</div>
-                    <v-icon small @click="gerarRelatorio(item)" color="blue">mdi-file-pdf-box</v-icon>
+                    <v-icon :style="{ fontSize: '24px' }" @click="gerarRelatorio(item)"
+                      color="blue">mdi-file-pdf-box</v-icon>
+
                   </td>
                 </tr>
               </tbody>
+
               <tfoot>
                 <tr v-if="!acudesPaginados.length">
                   <td colspan="8" class="text-center">
