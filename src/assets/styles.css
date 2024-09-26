@@ -98,7 +98,6 @@ thead {
 }
 
 .centered-snackbar {
-  /* Remova quaisquer estilos de alinhamento central que a classe possa ter */
   position: absolute;
   right: 0; /* Alinha à direita */
   top: 0; /* Alinha ao topo */
@@ -173,26 +172,53 @@ thead {
   padding: 8px 20px;
 }
 
+/* Estilos de botões */
 .btn-primary {
-  background-color: #1976d2;
-  color: white;
+  background-color: #1976d2 !important;
+  color: white !important;
 }
 
 .btn-outline {
-  background-color: white;
-  border: 2px solid #1976d2;
-  color: #1976d2;
+  background-color: white !important;
+  border: 2px solid #1976d2 !important;
+  color: #1976d2 !important;
 }
 
 .btn-primary:hover,
 .btn-outline:hover {
-  opacity: 0.8;
+  opacity: 0.8 !important;
 }
+
+.v-btn {
+  margin-top: 10px;
+  background-color: #1976d2 !important; /* Força o background azul */
+  color: white !important; /* Cor do texto em branco */
+}
+
+.v-btn:hover {
+  opacity: 0.8 !important;
+}
+
+.v-btn:active {
+  background-color: #1565c0 !important; /* Azul mais escuro ao ser clicado */
+}
+
+/* Botões no tema escuro */
+.v-theme--dark .v-btn {
+  background-color: #333 !important; /* Cor de fundo no tema escuro */
+  color: white !important; /* Texto branco no tema escuro */
+}
+
+.v-theme--dark .v-btn:hover {
+  opacity: 0.9 !important; /* Leve transparência no hover no tema escuro */
+}
+
 .centered-progress {
   display: flex;
   justify-content: center;
   align-items: center;
 }
+
 .overlay {
   position: fixed;
   top: 0;
@@ -205,21 +231,13 @@ thead {
   align-items: center;
   z-index: 10; /* Ajuste conforme necessário para garantir que fique sobre outros elementos */
 }
+
 .login-container {
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
   background-color: #f5f5f5;
-}
-
-.v-card {
-  padding: 20px;
-  border-radius: 10px;
-}
-
-.v-btn {
-  margin-top: 10px;
 }
 
 .v-text-field {
@@ -243,6 +261,7 @@ thead {
 .v-card-actions.alert-actions {
   justify-content: flex-end;
 }
+
 .custom-input-nome-container {
   display: flex;
   justify-content: center; /* Centraliza horizontalmente */
@@ -256,56 +275,66 @@ thead {
   border-radius: 4px;
   margin-left: 400px;
 }
+
 .icon-cav {
-  width: 19px; /* Ajuste o tamanho para ser consistente com os outros ícones */
+  width: 19px;
   height: 16px;
-  background-color: #2196f3; /* Azul consistente com outros ícones */
+  background-color: blue !important;
   color: white;
-  display: inline-flex; /* Usar inline-flex para alinhar com outros ícones */
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 10px; /* Ajustar para que o texto fique proporcional ao ícone */
+  font-size: 10px;
   font-weight: bold;
   border-radius: 4px;
   cursor: pointer;
   text-align: center;
-  margin-right: 5px; /* Espaçamento entre os ícones */
-  vertical-align: middle; /* Alinhamento vertical */
+  margin-right: 5px;
+  vertical-align: middle;
 }
 
 .icon-cav:hover {
-  background-color: #1976d2; /* Azul um pouco mais escuro no hover */
+  background-color: #1976d2;
 }
-/* Estilos para a tabela quando o tema escuro estiver ativo */
+
+/* Tema escuro para tabelas e ícones */
 .v-theme--dark .custom-table {
-  color: white !important; /* Cor do texto */
+  color: white !important;
 }
 
 .v-theme--dark .custom-table thead th {
-  background-color: #333 !important; /* Fundo do cabeçalho da tabela no tema escuro */
-  color: white !important; /* Cor do texto no cabeçalho */
+  background-color: #333 !important;
+  color: white !important;
 }
 
 .v-theme--dark .custom-table tbody tr:nth-child(odd) {
-  background-color: #444 !important; /* Fundo das linhas ímpares no tema escuro */
+  background-color: #444 !important;
 }
 
 .v-theme--dark .custom-table tbody tr:nth-child(even) {
-  background-color: #555 !important; /* Fundo das linhas pares no tema escuro */
+  background-color: #555 !important;
 }
 
 .v-theme--dark .custom-table tbody td {
-  color: white !important; /* Cor do texto nas células da tabela */
-}
-
-.v-theme--dark .custom-table .v-icon {
-  color: white !important; /* Ícones com cor branca no tema escuro */
-}
-
-.v-theme--dark .custom-table tbody td {
-  border-bottom: 1px solid #666 !important; /* Borda entre as linhas no tema escuro */
+  color: white !important;
+  border-bottom: 1px solid #666 !important;
 }
 
 .v-theme--dark .custom-table thead th {
-  border-bottom: 2px solid #555 !important; /* Borda no cabeçalho da tabela no tema escuro */
+  border-bottom: 2px solid #555 !important;
+}
+
+.v-theme--dark .v-icon {
+  color: white !important; /* Garante que ícones fiquem brancos no tema escuro */
+}
+
+/* Aplicação global de cores nos ícones */
+.v-icon {
+  color: blue !important; /* Cor azul para ícones em todos os temas */
+}
+
+.custom-card-title,
+.custom-header,
+td {
+  font-weight: bold;
 }

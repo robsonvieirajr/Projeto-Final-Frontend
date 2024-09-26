@@ -31,6 +31,33 @@ const controller = {
       return res.status(500).json({ message: "Erro ao criar açude", error });
     }
   },
+  async importarDadosChuva() {
+    try {
+      // Separe o nome do município e do posto
+      const [municipioSelecionado, posto] = this.dadosChuva.municipio.split(' - ');
+      const anoInicial = this.dadosChuva.dataInicial.split('/')[1];
+      const anoFinal = this.dadosChuva.dataFinal.split('/')[1];
+
+      // Adicione logs para verificar os valores
+      console.log("Municipio:", municipioSelecionado);
+      console.log("Estação:", posto);
+      console.log("Ano Inicial:", anoInicial);
+      console.log("Ano Final:", anoFinal);
+
+      // Envie os dados separadamente
+      const response = await acudeService.importarChuvas(municipioSelecionado, posto, anoInicial, anoFinal, this.dadosChuva.codigo);
+      
+      this.dadosImportados = response.objeto[0].anosMensais;
+      this.dialogoDadosImportados = true;
+      this.dialogoChuva = false; // Fecha o modal de importação
+    } catch (error) {
+      console.error("Erro ao importar dados de chuva:", error);
+    }
+  }
+
+
+  
+  
 };
 
 export default controller;

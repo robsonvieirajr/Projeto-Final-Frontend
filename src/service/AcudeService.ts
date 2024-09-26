@@ -37,6 +37,32 @@ const acudeService = {
     }
   },
 
+  
+  async importarChuvas(municipio, posto, anoInicial, anoFinal, codigo) {
+    try {
+        // Verifique se todos os parâmetros estão sendo passados corretamente
+        const response = await axios.get('http://localhost:8080/api/v1/chuva/importarChuvas', {
+            params: {
+                municipio,  // Nome do município
+                posto,      // Nome do posto pluviométrico
+                anoInicial, // Ano inicial
+                anoFinal,   // Ano final
+                codigo      // Código do município ou do posto
+            },
+        });
+
+        return response.data;
+    } catch (error) {
+        console.error("Erro ao importar dados de chuva:", error);
+        throw new Error("Erro ao importar dados de chuva");
+    }
+},
+
+
+
+
+  
+
   async createAcude(acude: AcudeData) {
     try {
       const response = await axios.post(`${API_URL}/criarAcudes`, acude);
@@ -50,6 +76,7 @@ const acudeService = {
       throw new Error(error.response?.data?.message || "Erro ao criar açude");
     }
   },
+  
 };
 
 export default acudeService;
