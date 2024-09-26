@@ -15,6 +15,7 @@
     "bootstrap-vue": "^2.23.1",
     "chart.js": "^4.4.2",
     "dayjs": "^1.11.13",
+    "g": "^2.0.1",
     "html2canvas": "^1.4.1",
     "js-cookie": "^3.0.5",
     "jspdf": "^2.5.1",

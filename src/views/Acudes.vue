@@ -5,134 +5,73 @@
         <!-- Seção do cabeçalho -->
         <div class="header-container">
           <h1>Consulta de Açudes</h1>
-          <v-btn class="btn-rounded btn-primary" @click="abrirModal"
-            >Cadastrar Açudes</v-btn
-          >
+          <v-btn class="btn-rounded btn-primary" @click="abrirModal">Cadastrar Açudes</v-btn>
         </div>
 
         <!-- Modal para cadastrar açudes -->
         <v-dialog v-model="dialogo" max-width="800px" class="custom-dialog">
           <v-card class="custom-card">
-            <v-card-title class="headline custom-card-title"
-              >Cadastrar Açude</v-card-title
-            >
+            <v-card-title class="headline custom-card-title">Cadastrar Açude</v-card-title>
             <v-card-text>
               <v-form ref="formulario">
                 <v-row>
                   <v-col cols="12">
                     <label for="nome">Nome</label>
-                    <input
-                      type="text"
-                      id="nome"
-                      v-model="novoAcude.nome"
-                      class="custom-input"
-                      required
-                      @input="validarFormulario"
-                    />
+                    <input type="text" id="nome" v-model="novoAcude.nome" class="custom-input" required
+                      @input="validarFormulario" />
                   </v-col>
                 </v-row>
                 <v-row>
                   <v-col cols="6">
                     <label for="volMorto">Volume Morto - VM (m³)</label>
-                    <input
-                      type="number"
-                      id="volMorto"
-                      v-model="novoAcude.volumeMorto"
-                      class="custom-input"
-                      required
-                      @input="validarFormulario"
-                    />
+                    <input type="number" id="volMorto" v-model="novoAcude.volumeMorto" class="custom-input" required
+                      @input="validarFormulario" />
                   </v-col>
                   <v-col cols="6">
                     <label for="volAcumulado">Volume Acumulado - VA (m³)</label>
-                    <input
-                      type="number"
-                      id="volAcumulado"
-                      v-model="novoAcude.volumeAcumulado"
-                      class="custom-input"
-                      required
-                      @input="validarFormulario"
-                    />
+                    <input type="number" id="volAcumulado" v-model="novoAcude.volumeAcumulado" class="custom-input"
+                      required @input="validarFormulario" />
                   </v-col>
                 </v-row>
                 <v-row>
                   <v-col cols="6">
                     <label for="volMaximo">Volume Máximo - VA (m³)</label>
-                    <input
-                      type="number"
-                      id="volMaximo"
-                      v-model="novoAcude.volumeMaximo"
-                      class="custom-input"
-                      required
-                      @input="validarFormulario"
-                    />
+                    <input type="number" id="volMaximo" v-model="novoAcude.volumeMaximo" class="custom-input" required
+                      @input="validarFormulario" />
                   </v-col>
                   <v-col cols="6">
                     <label for="drenagem">Área de Drenagem - A (km²)</label>
-                    <input
-                      type="number"
-                      id="drenagem"
-                      v-model="novoAcude.drenagem"
-                      class="custom-input"
-                      required
-                      @input="validarFormulario"
-                    />
+                    <input type="number" id="drenagem" v-model="novoAcude.drenagem" class="custom-input" required
+                      @input="validarFormulario" />
                   </v-col>
                 </v-row>
                 <v-row>
                   <v-col cols="6">
                     <label for="coefTanque">Coeficiente de Tanque</label>
-                    <input
-                      type="number"
-                      id="coefTanque"
-                      v-model="novoAcude.coeficienteTanque"
-                      class="custom-input"
-                      required
-                      @input="validarFormulario"
-                    />
+                    <input type="number" id="coefTanque" v-model="novoAcude.coeficienteTanque" class="custom-input"
+                      required @input="validarFormulario" />
                   </v-col>
                 </v-row>
               </v-form>
             </v-card-text>
             <v-card-actions class="custom-card-actions">
               <v-spacer></v-spacer>
-              <v-btn class="btn-rounded btn-outline" @click="fecharModal"
-                >Cancelar</v-btn
-              >
-              <v-btn
-                :disabled="!formularioValido"
-                class="btn-rounded btn-primary"
-                @click="salvarAcude"
-                >Salvar</v-btn
-              >
+              <v-btn class="btn-rounded btn-outline" @click="fecharModal">Cancelar</v-btn>
+              <v-btn :disabled="!formularioValido" class="btn-rounded btn-primary" @click="salvarAcude">Salvar</v-btn>
             </v-card-actions>
           </v-card>
         </v-dialog>
 
         <!-- Modal para Importar Chuva -->
-        <v-dialog
-          v-model="dialogoChuvaImportada"
-          max-width="1200px"
-          class="custom-dialog"
-        >
+        <v-dialog v-model="dialogoChuvaImportada" max-width="1200px" class="custom-dialog">
           <v-card class="custom-card">
-            <v-card-title class="headline custom-card-title"
-              >Dados de Chuva Importados</v-card-title
-            >
+            <v-card-title class="headline custom-card-title">Dados de Chuva Importados</v-card-title>
             <v-card-text>
               <!-- Verifica se existem dados importados -->
-              <div
-                v-if="dadosChuvaImportados && dadosChuvaImportados.length > 0"
-              >
+              <div v-if="dadosChuvaImportados && dadosChuvaImportados.length > 0">
                 <v-row>
                   <!-- Itera sobre os dados importados -->
-                  <v-col
-                    v-for="(dados, index) in dadosChuvaImportados"
-                    :key="index"
-                    cols="12"
-                    sm="4"
-                    class="px-4"
-                  >
+                  <v-col v-for="(dados, index) in dadosChuvaImportados" :key="index" cols="12" sm="4" class="px-4">
                     <h3 class="custom-header">
                       Município: <strong>{{ dados.municipio }}</strong>
                     </h3>
@@ -141,36 +80,25 @@
                     </h3>
                     <!-- Itera sobre os anos mensais de dados importados -->
                     <v-row v-for="ano in dados.anosMensais" :key="ano.ano">
-                      <h3
-                        class="custom-header"
-                        style="
+                      <h3 class="custom-header" style="
                           text-align: center;
                           margin-top: 30px;
                           margin-left: 50px;
-                        "
-                      >
+                        ">
                         Ano: <strong>{{ ano.ano }}</strong>
                       </h3>
                       <!-- Adiciona um console log para verificar os dados -->
                       <div v-if="console.log(ano.dadosMensais)">
                         <!-- Confere os dados no console -->
                       </div>
-                      <v-data-table
-                        :headers="[
-                          { text: 'Mês', value: 'mes' },
-                          { text: 'Valor (mm)', value: 'valor' },
-                        ]"
-                        :items="
-                          ano.dadosMensais.map((item) => ({
-                            ...item,
-                            valor: `${item.valor} mm`,
-                          }))
-                        "
-                        hide-default-footer
-                        class="elevation-1"
-                        :items-per-page="12"
-                        dense
-                      ></v-data-table>
+                      <v-data-table :headers="[
+                        { text: 'Mês', value: 'mes' },
+                        { text: 'Valor (mm)', value: 'valor' },
+                      ]" :items="ano.dadosMensais.map((item) => ({
+                          ...item,
+                          valor: `${item.valor} mm`,
+                        }))
+                          " hide-default-footer class="elevation-1" :items-per-page="12" dense></v-data-table>
                     </v-row>
                   </v-col>
                 </v-row>
@@ -183,70 +111,39 @@
             <v-card-actions class="custom-card-actions">
               <v-spacer></v-spacer>
               <div class="custom-pagination-wrapper">
-                <v-pagination
-                  v-model="pagina"
-                  :length="totalPaginas"
-                  class="custom-pagination"
-                  circle
-                ></v-pagination>
+                <v-pagination v-model="pagina" :length="totalPaginas" class="custom-pagination" circle></v-pagination>
               </div>
               <v-spacer></v-spacer>
-              <v-btn
-                class="btn-rounded btn-primary"
-                style="margin-right: 10px"
-                @click="salvarDadosChuva"
-                >Salvar</v-btn
-              >
-              <v-btn
-                class="btn-rounded btn-outline"
-                @click="dialogoChuvaImportada = false"
-                >Fechar</v-btn
-              >
+              <v-btn class="btn-rounded btn-primary" style="margin-right: 10px" @click="salvarDadosChuva">Salvar</v-btn>
+              <v-btn class="btn-rounded btn-outline" @click="dialogoChuvaImportada = false">Fechar</v-btn>
             </v-card-actions>
           </v-card>
         </v-dialog>
 
         <!-- Modal para Dados de Chuva -->
-        <v-dialog
-          v-model="dialogoChuva"
-          max-width="800px"
-          class="custom-dialog"
-        >
+        <v-dialog v-model="dialogoChuva" max-width="800px" class="custom-dialog">
           <v-card class="custom-card">
-            <v-card-title class="headline custom-card-title"
-              >Dados de Chuva</v-card-title
-            >
+            <v-card-title class="headline custom-card-title">Dados de Chuva</v-card-title>
             <v-card-text>
               <v-form ref="formularioChuva">
                 <v-row>
                   <!-- Seletor de Município -->
                   <v-col cols="6">
                     <label for="municipio">Município</label>
-                    <v-select
-                      v-model="dadosChuva.municipio"
-                      :items="
-                        municipiosPostos
-                          .map((item) => item.municipio)
-                          .filter(
-                            (value, index, self) =>
-                              self.indexOf(value) === index
-                          )
-                      "
-                      label="Selecione o município"
-                      @change="atualizarPosto"
-                      required
-                    ></v-select>
+                    <v-select v-model="dadosChuva.municipio" :items="municipiosPostos
+                        .map((item) => item.municipio)
+                        .filter(
+                          (value, index, self) =>
+                            self.indexOf(value) === index
+                        )
+                      " label="Selecione o município" @change="atualizarPosto" required></v-select>
                   </v-col>
 
                   <!-- Seletor de Estação -->
                   <v-col cols="6">
                     <label for="estacao">Estação Pluviométrica</label>
-                    <v-select
-                      v-model="dadosChuva.estacao"
-                      :items="postosFiltrados"
-                      label="Selecione a estação"
-                      required
-                    ></v-select>
+                    <v-select v-model="dadosChuva.estacao" :items="postosFiltrados" label="Selecione a estação"
+                      required></v-select>
                   </v-col>
                 </v-row>
 
@@ -254,25 +151,15 @@
                   <!-- Campo para Data Inicial -->
                   <v-col cols="6">
                     <label for="dataInicial">Ano Inicial</label>
-                    <v-text-field
-                      v-model="dadosChuva.dataInicial"
-                      prepend-icon="mdi-calendar"
-                      placeholder="YYYY"
-                      @input="formatarMesAno('dataInicial')"
-                      required
-                    ></v-text-field>
+                    <v-text-field v-model="dadosChuva.dataInicial" prepend-icon="mdi-calendar" placeholder="YYYY"
+                      @input="formatarMesAno('dataInicial')" required></v-text-field>
                   </v-col>
 
                   <!-- Campo para Data Final -->
                   <v-col cols="6">
                     <label for="dataFinal">Ano Final</label>
-                    <v-text-field
-                      v-model="dadosChuva.dataFinal"
-                      prepend-icon="mdi-calendar"
-                      placeholder="YYYY"
-                      @input="formatarMesAno('dataFinal')"
-                      required
-                    ></v-text-field>
+                    <v-text-field v-model="dadosChuva.dataFinal" prepend-icon="mdi-calendar" placeholder="YYYY"
+                      @input="formatarMesAno('dataFinal')" required></v-text-field>
                   </v-col>
                 </v-row>
               </v-form>
@@ -281,15 +168,9 @@
             <!-- Botões do Modal -->
             <v-card-actions class="custom-card-actions">
               <v-spacer></v-spacer>
-              <v-btn class="btn-rounded btn-outline" @click="fecharModalChuva"
-                >Cancelar</v-btn
-              >
-              <v-btn
-                :loading="carregando"
-                class="btn-rounded btn-primary"
-                @click="importarDadosChuva"
-                :disabled="carregando"
-              >
+              <v-btn class="btn-rounded btn-outline" @click="fecharModalChuva">Cancelar</v-btn>
+              <v-btn :loading="carregando" class="btn-rounded btn-primary" @click="importarDadosChuva"
+                :disabled="carregando">
                 Importar
               </v-btn>
             </v-card-actions>
@@ -297,26 +178,13 @@
         </v-dialog>
 
         <!-- Snackbar de sucesso -->
-        <v-snackbar
-          v-model="dialogoSucesso"
-          :timeout="timeout"
-          color="success"
-          top
-          right
-        >
+        <v-snackbar v-model="dialogoSucesso" :timeout="timeout" color="success" top right>
           Açude cadastrado com sucesso!
           <v-btn color="white" text @click="fecharDialogoSucesso">Fechar</v-btn>
         </v-snackbar>
 
         <!-- Snackbar de erro -->
-        <v-snackbar
-          v-model="dialogoErro"
-          :timeout="timeout"
-          color="error"
-          class="centered-snackbar"
-          top
-          right
-        >
+        <v-snackbar v-model="dialogoErro" :timeout="timeout" color="error" class="centered-snackbar" top right>
           {{ mensagemErro }}
           <v-btn color="white" text @click="fecharDialogoErro">Fechar</v-btn>
         </v-snackbar>
@@ -331,33 +199,35 @@
             <div class="filter-container">
               <div class="filter-input">
                 <label for="nome">Nome</label>
-                <input
-                  type="text"
-                  id="nome"
-                  v-model="filtros.nome"
-                  class="custom-input-nome"
-                />
+                <input type="text" id="nome" v-model="filtros.nome" class="custom-input-nome" />
               </div>
             </div>
             <div class="filter-actions">
-              <v-btn class="btn-rounded btn-primary" @click="pesquisarAcudes"
-                >Pesquisar</v-btn
-              >
-              <v-btn class="btn-rounded btn-outline" @click="limparFiltros"
-                >Limpar</v-btn
-              >
+              <v-btn class="btn-rounded btn-primary" @click="pesquisarAcudes">Pesquisar</v-btn>
+              <v-btn class="btn-rounded btn-outline" @click="limparFiltros">Limpar</v-btn>
             </div>
           </v-card-text>
         </v-card>
 
+        <v-snackbar
+    v-model="snackbar"
+    :timeout="3000"
+    bottom
+    right
+  >
+    {{ snackbarMessage }}
+    <v-btn
+      color="red"
+      text
+      @click="snackbar = false"
+    >
+      Fechar
+    </v-btn>
+  </v-snackbar>
+
         <!-- Indicador de carregamento -->
         <div v-if="carregando" class="overlay">
-          <v-progress-circular
-            indeterminate
-            color="primary"
-            size="50"
-            width="5"
-          ></v-progress-circular>
+          <v-progress-circular indeterminate color="primary" size="50" width="5"></v-progress-circular>
         </div>
 
         <!-- Tabela de Resultados -->
@@ -368,12 +238,8 @@
             Resultado da busca
           </v-card-title>
           <v-card-text>
-            <v-data-table
-              :items="acudesPaginados"
-              class="elevation-1 custom-table"
-              :items-per-page="itensPorPagina"
-              hide-default-footer
-            >
+            <v-data-table :items="acudesPaginados" class="elevation-1 custom-table" :items-per-page="itensPorPagina"
+              hide-default-footer>
               <thead>
                 <tr>
                   <th class="text-center" width="5%">ID</th>
@@ -407,36 +273,14 @@
                     {{ formatarNumero(item.coeficienteTanque) }}
                   </td>
                   <td class="text-center">
-                    <v-icon
-                      small
-                      @click="handleClick('chuva', item)"
-                      color="blue"
-                      >mdi-weather-rainy</v-icon
-                    >
-                    <v-icon
-                      small
-                      @click="handleClick('vazao', item)"
-                      color="blue"
-                      >mdi-waves</v-icon
-                    >
-                    <v-icon
-                      small
-                      @click="handleClick('evaporacao', item)"
-                      color="blue"
-                      >mdi-thermometer</v-icon
-                    >
-                    <div
-                      class="icon-cav"
-                      @click="handleClick('cotaAreaVolume', item)"
-                    >
+                    <v-icon small @click="handleClick('chuva', item)" color="blue">mdi-weather-rainy</v-icon>
+                    <v-icon small @click="handleClick('vazao', item)" color="blue">mdi-waves</v-icon>
+                    <v-icon small @click="handleClick('evaporacao', item)" color="blue">mdi-thermometer</v-icon>
+                    <div class="icon-cav" @click="handleClick('cotaAreaVolume', item)">
                       CAV
                     </div>
-                    <v-icon
-                      :style="{ fontSize: '24px' }"
-                      @click="gerarRelatorio(item)"
-                      color="blue"
-                      >mdi-file-pdf-box</v-icon
-                    >
+                    <v-icon :style="{ fontSize: '24px' }" @click="gerarRelatorio(item)"
+                      color="blue">mdi-file-pdf-box</v-icon>
                   </td>
                 </tr>
               </tbody>
@@ -444,16 +288,9 @@
               <tfoot>
                 <tr v-if="!acudesPaginados.length">
                   <td colspan="8" class="text-center">
-                    <div
-                      class="d-flex flex-column align-center justify-center"
-                      style="height: 10px"
-                    >
-                      <v-alert
-                        :value="true"
-                        color="light-blue"
-                        class="text-center"
-                        style="color: white; background-color: #e3f2fd"
-                      >
+                    <div class="d-flex flex-column align-center justify-center" style="height: 10px">
+                      <v-alert :value="true" color="light-blue" class="text-center"
+                        style="color: white; background-color: #e3f2fd">
                         Não foram encontrados registros correspondentes à
                         pesquisa.
                       </v-alert>
@@ -466,14 +303,8 @@
         </v-card>
 
         <!-- Componente de Paginação -->
-        <v-pagination
-          v-if="pesquisaRealizada && !carregando"
-          v-model="pagina"
-          :length="totalPaginas"
-          total-visible="7"
-          color="primary"
-          class="mt-4"
-        ></v-pagination>
+        <v-pagination v-if="pesquisaRealizada && !carregando" v-model="pagina" :length="totalPaginas" total-visible="7"
+          color="primary" class="mt-4"></v-pagination>
       </v-col>
     </v-row>
   </v-container>
@@ -485,6 +316,7 @@ import acudeService from "@/service/AcudeService";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import BarChart from "@/components/BarChart.vue"; // Importa o componente de gráfico
+import { Alert } from "bootstrap";
 
 export default {
   name: "AcudeSearch",
@@ -2135,6 +1967,8 @@ export default {
       dialogoErro: false,
       mensagemErro: "",
       textoSnackbar: "",
+      snackbar: false,       // Controla a visibilidade do Snackbar
+      snackbarMessage: '',   // Mensagem exibida no Snackbar
       timeout: 3000,
       formularioValido: false,
       carregando: false,
@@ -2230,7 +2064,12 @@ export default {
     if (response && response.objeto && response.objeto.length > 0) {
       this.dadosChuvaImportados = response.objeto;
       console.log("Dados de chuva importados:", this.dadosChuvaImportados); // Verificação dos dados
-      this.dialogoChuvaImportada = true; // Abre o modal com os dados importados
+      
+      // Aqui você abre o modal de importação dos dados, caso precise
+      this.dialogoChuvaImportada = true;
+
+      // Fechar o modal de importação ao final do processo
+      this.dialogoChuva = false; // Fecha o modal principal de importação
     } else {
       this.$toast.error("Nenhum dado retornado.");
     }
@@ -2241,8 +2080,6 @@ export default {
     this.carregando = false; // Desativa o estado de carregamento após a conclusão
   }
 },
-
-
 
 
     atualizarPosto() {
@@ -2269,61 +2106,94 @@ export default {
       console.log(
         "Postos disponíveis para o município selecionado:",
         this.postosFiltrados
+
       );
 
       // Limpar o campo de estação para forçar o usuário a escolher um novo posto
       this.dadosChuva.estacao = null;
+
+     
+      
     },
 
     handleClick(acao, item) {
-    if (acao === "chuva") {
-      this.dialogoChuva = true; // Abre o modal
-      this.dadosChuva.municipio = item.municipio; // Preenche o município com o valor do item
-      this.idAcude = item.id; // Captura o ID do açude
+      if (acao === "chuva") {
+        this.dialogoChuva = true; // Abre o modal
+        this.dadosChuva.municipio = item.municipio; // Preenche o município com o valor do item
+        this.idAcude = item.id; // Captura o ID do açude
 
-      // Adiciona o ID do açude na URL
-      const url = new URL(window.location.href);
-      url.searchParams.set('idAcude', this.idAcude);
-      window.history.pushState({}, '', url); // Atualiza a URL sem recarregar a página
+        // Adiciona o ID do açude na URL
+        const url = new URL(window.location.href);
+        url.searchParams.set('idAcude', this.idAcude);
+        window.history.pushState({}, '', url); // Atualiza a URL sem recarregar a página
 
-      this.atualizarPosto(); // Atualiza a estação pluviométrica com base no município selecionado
+        this.atualizarPosto(); // Atualiza a estação pluviométrica com base no município selecionado
+      }
+    },
+
+    async salvarDadosChuva() {
+    // Verifique se há dados para salvar
+    if (!this.dadosChuvaImportados || this.dadosChuvaImportados.length === 0) {
+      this.$toast.error("Nenhum dado de chuva para salvar.");
+      return;
+    }
+
+    // Obtenha o idAcude da URL ou de onde ele estiver armazenado
+    const idAcude = this.$route.query.idAcude; // Verificar se o idAcude está na URL
+
+    // // Se o idAcude estiver indefinido, exiba uma mensagem de erro
+    // if (!idAcude) {
+    //   this.$toast.error("ID do Açude não encontrado.");
+    //   return;
+    // }
+
+    // Log para verificar o ID do Açude
+    console.log("ID do Açude:", idAcude);
+
+    // Prepare os dados no formato esperado pelo backend
+    const dadosParaSalvar = this.dadosChuvaImportados.map(dado => ({
+      idAcude: idAcude, // Usar o idAcude obtido da URL
+      municipio: dado.municipio,
+      estacao: dado.estacao,
+      anosMensais: dado.anosMensais.map(ano => ({
+        ano: ano.ano,
+        chuvaPorMes: ano.dadosMensais.reduce((acc, item) => {
+          acc[item.mes] = parseFloat(String(item.valor).replace(' mm', '')); // Corrigir o formato dos valores
+          return acc;
+        }, {}),
+      })),
+    }));
+
+    // Verifique os dados que serão enviados ao backend
+    console.log("Dados para salvar:", dadosParaSalvar);
+
+    try {
+      // Chama o serviço para salvar os dados de chuva no backend
+      const response = await acudeService.salvarChuvas(dadosParaSalvar);
+
+      // Exibe o Snackbar personalizado com a mensagem de sucesso
+      this.snackbarMessage = "Dados de chuva foram salvos com sucesso!";
+      this.snackbar = true;
+
+      // Fechar o modal após salvar com sucesso
+      this.dialogoChuvaImportada = false;
+
+      // Forçar a atualização da interface para garantir que o modal feche
+      this.$forceUpdate();
+
+    } catch (error) {
+      console.error("Erro ao salvar os dados de chuva:", error);
+
+      // Tratamento para casos em que a resposta de erro não possui a estrutura esperada
+      if (error.response && error.response.data && error.response.data.message) {
+        this.$toast.error(error.response.data.message);
+      } else {
+        this.$toast.error("Erro ao salvar os dados de chuva.");
+      }
     }
   },
 
-    async salvarDadosChuva() {
-      // Verifique se há dados para salvar
-      if (!this.dadosChuvaImportados || this.dadosChuvaImportados.length === 0) {
-        this.$toast.error("Nenhum dado de chuva para salvar.");
-        return;
-      }
 
-      // Prepare os dados no formato esperado pelo backend
-      const dadosParaSalvar = this.dadosChuvaImportados.map(dado => ({
-        idAcude: dado.idAcude,
-        municipio: dado.municipio,
-        estacao: dado.estacao,
-        anosMensais: dado.anosMensais.map(ano => ({
-          ano: ano.ano,
-          chuvaPorMes: ano.dadosMensais.reduce((acc, item) => {
-            acc[item.mes] = parseFloat(String(item.valor).replace(' mm', '')); // Corrigido
-            return acc;
-          }, {}),
-        })),
-      }));
-
-      try {
-        // Chama o serviço para salvar os dados de chuva no backend
-        const response = await acudeService.salvarChuvas(dadosParaSalvar);
-        this.$toast.success("Dados de chuva salvos com sucesso!");
-        
-        // Fechar o modal após salvar
-        this.dialogoChuvaImportada = false;
-      } catch (error) {
-        console.error("Erro ao salvar os dados de chuva:", error);
-        this.$toast.error("Erro ao salvar os dados de chuva.");
-      }
-    },
-  
     async pesquisarAcudes() {
       this.carregando = true;
       setTimeout(async () => {
@@ -2416,19 +2286,19 @@ export default {
         this.novoAcude.coeficienteTanque !== null;
     },
     handleClick(acao, item) {
-     if (acao === "chuva") {
-      this.dialogoChuva = true; // Abre o modal
-      this.dadosChuva.municipio = item.municipio; // Preenche o município com o valor do item
-      this.idAcude = item.id; // Captura o ID do açude
+      if (acao === "chuva") {
+        this.dialogoChuva = true; // Abre o modal
+        this.dadosChuva.municipio = item.municipio; // Preenche o município com o valor do item
+        this.idAcude = item.id; // Captura o ID do açude
 
-      // Adiciona o ID do açude na URL
-      const url = new URL(window.location.href);
-      url.searchParams.set('idAcude', this.idAcude);
-      window.history.pushState({}, '', url); // Atualiza a URL sem recarregar a página
+        // Adiciona o ID do açude na URL
+        const url = new URL(window.location.href);
+        url.searchParams.set('idAcude', this.idAcude);
+        window.history.pushState({}, '', url); // Atualiza a URL sem recarregar a página
 
-      this.atualizarPosto(); // Atualiza a estação pluviométrica com base no município selecionado
-    }
-  },
+        this.atualizarPosto(); // Atualiza a estação pluviométrica com base no município selecionado
+      }
+    },
 
     fecharModalChuva() {
       this.dialogoChuva = false;

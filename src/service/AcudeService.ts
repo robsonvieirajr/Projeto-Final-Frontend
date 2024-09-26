@@ -86,8 +86,8 @@ const acudeService = {
         },
       });
   
-      // Verifica se o status é 201 (Criado)
-      if (response.status === 201) {
+      // Verifica se o status é 200 (OK) em vez de 201
+      if (response.status === 200) {
         Cookies.set("token", response.data.token, { expires: 7 });
         return response.data; // Retorna os dados completos da resposta
       } else {
@@ -95,9 +95,20 @@ const acudeService = {
       }
     } catch (error) {
       console.error("Erro ao salvar os dados de chuvas:", error);
-      throw new Error(error.response?.data?.message || "Erro ao salvar dados de chuvas");
+      
+      // Mostrando alert em caso de erro
+      alert("Erro ao salvar os dados de chuva!");
+
+      // Verifique se a resposta do erro existe
+      if (error.response && error.response.data) {
+        console.log("Detalhes do erro:", error.response.data);
+        throw new Error(error.response.data.message || "Erro ao salvar dados de chuvas");
+      } else {
+        throw new Error("Erro desconhecido ao salvar dados de chuvas");
+      }
     }
-  }
+}
+
   
 };
 
