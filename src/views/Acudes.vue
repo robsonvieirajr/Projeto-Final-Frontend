@@ -2265,6 +2265,40 @@ export default {
       }
     },
 
+    async salvarDadosChuva() {
+      // Verifique se há dados para salvar
+      if (!this.dadosChuvaImportados || this.dadosChuvaImportados.length === 0) {
+        this.$toast.error("Nenhum dado de chuva para salvar.");
+        return;
+      }
+
+      // Prepare os dados no formato esperado pelo backend
+      const dadosParaSalvar = this.dadosChuvaImportados.map(dado => ({
+        idAcude: dado.idAcude,
+        municipio: dado.municipio,
+        estacao: dado.estacao,
+        anosMensais: dado.anosMensais.map(ano => ({
+          ano: ano.ano,
+          chuvaPorMes: ano.dadosMensais.reduce((acc, item) => {
+            acc[item.mes] = parseFloat(String(item.valor).replace(' mm', '')); // Corrigido
+            return acc;
+          }, {}),
+        })),
+      }));
+
+      try {
+        // Chama o serviço para salvar os dados de chuva no backend
+        const response = await acudeService.salvarChuvas(dadosParaSalvar);
+        this.$toast.success("Dados de chuva salvos com sucesso!");
+        
+        // Fechar o modal após salvar
+        this.dialogoChuvaImportada = false;
+      } catch (error) {
+        console.error("Erro ao salvar os dados de chuva:", error);
+        this.$toast.error("Erro ao salvar os dados de chuva.");
+      }
+    },
+  
     async pesquisarAcudes() {
       this.carregando = true;
       setTimeout(async () => {

@@ -2,8 +2,10 @@
 import axios from "axios";
 import Cookies from "js-cookie";
 import { AcudeData } from "../model/Acude"; // Ajuste o caminho conforme necessário
+import { ChuvaData } from "../model/Chuva";
 
 const API_URL = "http://localhost:8080/api/v1/acude";
+const API_URL_CHUVA = "http://localhost:8080/api/v1/chuva"
 
 const acudeService = {
   async listarTodosAcudes(nome: string) {
@@ -73,6 +75,30 @@ const acudeService = {
       throw new Error(error.response?.data?.message || "Erro ao criar açude");
     }
   },
+  async salvarChuvas(chuva: ChuvaData) {
+    try {
+      console.log("Dados sendo enviados para o backend:", chuva);
+  
+      // Faz a requisição POST com os dados da chuva
+      const response = await axios.post(`${API_URL_CHUVA}/salvarChuvas`, chuva, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+  
+      // Verifica se o status é 201 (Criado)
+      if (response.status === 201) {
+        Cookies.set("token", response.data.token, { expires: 7 });
+        return response.data; // Retorna os dados completos da resposta
+      } else {
+        throw new Error("Falha ao salvar dados de chuva");
+      }
+    } catch (error) {
+      console.error("Erro ao salvar os dados de chuvas:", error);
+      throw new Error(error.response?.data?.message || "Erro ao salvar dados de chuvas");
+    }
+  }
+  
 };
 
 export default acudeService;

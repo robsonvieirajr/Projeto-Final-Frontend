@@ -34,9 +34,10 @@ const controller = {
   async importarDadosChuva() {
     try {
       // Separe o nome do município e do posto
-      const [municipioSelecionado, posto] = this.dadosChuva.municipio.split(' - ');
-      const anoInicial = this.dadosChuva.dataInicial.split('/')[1];
-      const anoFinal = this.dadosChuva.dataFinal.split('/')[1];
+      const [municipioSelecionado, posto] =
+        this.dadosChuva.municipio.split(" - ");
+      const anoInicial = this.dadosChuva.dataInicial.split("/")[1];
+      const anoFinal = this.dadosChuva.dataFinal.split("/")[1];
 
       // Adicione logs para verificar os valores
       console.log("Municipio:", municipioSelecionado);
@@ -45,19 +46,45 @@ const controller = {
       console.log("Ano Final:", anoFinal);
 
       // Envie os dados separadamente
-      const response = await acudeService.importarChuvas(municipioSelecionado, posto, anoInicial, anoFinal, this.dadosChuva.codigo);
-      
+      const response = await acudeService.importarChuvas(
+        municipioSelecionado,
+        posto,
+        anoInicial,
+        anoFinal,
+        this.dadosChuva.codigo
+      );
+
       this.dadosImportados = response.objeto[0].anosMensais;
       this.dialogoDadosImportados = true;
       this.dialogoChuva = false; // Fecha o modal de importação
     } catch (error) {
       console.error("Erro ao importar dados de chuva:", error);
     }
-  }
+  },
+  async salvarDadosChuva() {
+    // Prepare os dados para enviar ao backend
+    const dadosParaSalvar = this.dadosChuvaImportados.map(dado => ({
+      idAcude: dado.idAcude,
+      municipio: dado.municipio,
+      estacao: dado.estacao,
+      anosMensais: dado.anosMensais.map(ano => ({
+        ano: ano.ano,
+        chuvaPorMes: ano.dadosMensais.reduce((acc, item) => {
+          acc[item.mes] = parseFloat(item.valor.replace(' mm', ''));
+          return acc;
+        }, {}),
+      })),
+    }));
 
-
-  
-  
-};
+    try {
+      // Chama o serviço para salvar os dados no backend
+      await acudeService.salvarChuvas(dadosParaSalvar);
+      this.$toast.success("Dados de chuva salvos com sucesso!");
+    } catch (error) {
+      console.error("Erro ao salvar os dados de chuva:", error);
+      this.$toast.error("Erro ao salvar os dados de chuva.");
+    }
+  },
+}
 
 export default controller;
