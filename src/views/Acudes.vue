@@ -2132,66 +2132,68 @@ export default {
     },
 
     async salvarDadosChuva() {
-    // Verifique se há dados para salvar
-    if (!this.dadosChuvaImportados || this.dadosChuvaImportados.length === 0) {
-      this.$toast.error("Nenhum dado de chuva para salvar.");
-      return;
+  // Verifique se há dados para salvar
+  if (!this.dadosChuvaImportados || this.dadosChuvaImportados.length === 0) {
+    this.$toast.error("Nenhum dado de chuva para salvar.");
+    return;
+  }
+
+  // Obtenha o idAcude diretamente da URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const idAcude = urlParams.get('idAcude'); // Verificar se o idAcude está na URL
+
+  // Se o idAcude estiver indefinido, exiba uma mensagem de erro
+  if (!idAcude) {
+    this.$toast.error("ID do Açude não encontrado.");
+    return;
+  }
+
+  // Log para verificar o ID do Açude
+  console.log("ID do Açude:", idAcude);
+
+  // Prepare os dados no formato esperado pelo backend
+  const dadosParaSalvar = this.dadosChuvaImportados.map(dado => ({
+    idAcude: idAcude, // Usar o idAcude obtido da URL
+    municipio: dado.municipio,
+    estacao: dado.estacao,
+    anosMensais: dado.anosMensais.map(ano => ({
+      ano: ano.ano,
+      chuvaPorMes: ano.dadosMensais.reduce((acc, item) => {
+        acc[item.mes] = parseFloat(String(item.valor).replace(' mm', '')); // Corrigir o formato dos valores
+        return acc;
+      }, {}),
+    })),
+  }));
+
+  // Verifique os dados que serão enviados ao backend
+  console.log("Dados para salvar:", dadosParaSalvar);
+
+  try {
+    // Chama o serviço para salvar os dados de chuva no backend
+    const response = await acudeService.salvarChuvas(dadosParaSalvar);
+
+    // Exibe o Snackbar personalizado com a mensagem de sucesso
+    this.snackbarMessage = "Dados de chuva foram salvos com sucesso!";
+    this.snackbar = true;
+
+    // Fechar o modal após salvar com sucesso
+    this.dialogoChuvaImportada = false;
+
+    // Forçar a atualização da interface para garantir que o modal feche
+    this.$forceUpdate();
+
+  } catch (error) {
+    console.error("Erro ao salvar os dados de chuva:", error);
+
+    // Tratamento para casos em que a resposta de erro não possui a estrutura esperada
+    if (error.response && error.response.data && error.response.data.message) {
+      this.$toast.error(error.response.data.message);
+    } else {
+      this.$toast.error("Erro ao salvar os dados de chuva.");
     }
+  }
+},
 
-    // Obtenha o idAcude da URL ou de onde ele estiver armazenado
-    const idAcude = this.$route.query.idAcude; // Verificar se o idAcude está na URL
-
-    // // Se o idAcude estiver indefinido, exiba uma mensagem de erro
-    // if (!idAcude) {
-    //   this.$toast.error("ID do Açude não encontrado.");
-    //   return;
-    // }
-
-    // Log para verificar o ID do Açude
-    console.log("ID do Açude:", idAcude);
-
-    // Prepare os dados no formato esperado pelo backend
-    const dadosParaSalvar = this.dadosChuvaImportados.map(dado => ({
-      idAcude: idAcude, // Usar o idAcude obtido da URL
-      municipio: dado.municipio,
-      estacao: dado.estacao,
-      anosMensais: dado.anosMensais.map(ano => ({
-        ano: ano.ano,
-        chuvaPorMes: ano.dadosMensais.reduce((acc, item) => {
-          acc[item.mes] = parseFloat(String(item.valor).replace(' mm', '')); // Corrigir o formato dos valores
-          return acc;
-        }, {}),
-      })),
-    }));
-
-    // Verifique os dados que serão enviados ao backend
-    console.log("Dados para salvar:", dadosParaSalvar);
-
-    try {
-      // Chama o serviço para salvar os dados de chuva no backend
-      const response = await acudeService.salvarChuvas(dadosParaSalvar);
-
-      // Exibe o Snackbar personalizado com a mensagem de sucesso
-      this.snackbarMessage = "Dados de chuva foram salvos com sucesso!";
-      this.snackbar = true;
-
-      // Fechar o modal após salvar com sucesso
-      this.dialogoChuvaImportada = false;
-
-      // Forçar a atualização da interface para garantir que o modal feche
-      this.$forceUpdate();
-
-    } catch (error) {
-      console.error("Erro ao salvar os dados de chuva:", error);
-
-      // Tratamento para casos em que a resposta de erro não possui a estrutura esperada
-      if (error.response && error.response.data && error.response.data.message) {
-        this.$toast.error(error.response.data.message);
-      } else {
-        this.$toast.error("Erro ao salvar os dados de chuva.");
-      }
-    }
-  },
 
 
     async pesquisarAcudes() {
