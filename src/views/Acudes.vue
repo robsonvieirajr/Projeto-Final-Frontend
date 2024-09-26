@@ -2199,33 +2199,51 @@ export default {
       }
     },
     async importarDadosChuva() {
-      try {
-        this.carregando = true; // Ativa o estado de carregamento
+  try {
+    this.carregando = true; // Ativa o estado de carregamento
 
-        const { municipio, estacao, dataInicial, dataFinal } = this.dadosChuva;
+    const { municipio, estacao, dataInicial, dataFinal } = this.dadosChuva;
 
-        // Envia a requisição
-        const response = await acudeService.importarChuvas(
-          municipio,
-          estacao,
-          dataInicial,
-          dataFinal
-        );
+    // Captura o idAcude da URL
+    const urlParams = new URLSearchParams(window.location.search);
+    console.log("URL Params:", urlParams); // Adiciona log para inspecionar os parâmetros
+    const idAcude = urlParams.get('idAcude'); // Obtém o idAcude da URL
 
-        // Verifica se há dados e define os dados no frontend
-        if (response && response.objeto && response.objeto.length > 0) {
-          this.dadosChuvaImportados = response.objeto;
-          console.log("Dados de chuva importados:", this.dadosChuvaImportados); // Verificação
-          this.dialogoChuvaImportada = true; // Abre o modal
-        } else {
-          console.error("Nenhum dado retornado.");
-        }
-      } catch (error) {
-        console.error("Erro ao importar os dados de chuva:", error);
-      } finally {
-        this.carregando = false; // Desativa o estado de carregamento após a conclusão
-      }
-    },
+    console.log("ID do Açude capturado:", idAcude); // Verificação do valor capturado
+
+    if (!idAcude) {
+      this.$toast.error("ID do açude não encontrado.");
+      this.carregando = false;
+      return;
+    }
+
+    // Envia a requisição com o idAcude incluído
+    const response = await acudeService.importarChuvas(
+      municipio,
+      estacao,
+      dataInicial,
+      dataFinal,
+      idAcude // Inclui o idAcude na requisição
+    );
+
+    // Verifica se há dados e define os dados no frontend
+    if (response && response.objeto && response.objeto.length > 0) {
+      this.dadosChuvaImportados = response.objeto;
+      console.log("Dados de chuva importados:", this.dadosChuvaImportados); // Verificação dos dados
+      this.dialogoChuvaImportada = true; // Abre o modal com os dados importados
+    } else {
+      this.$toast.error("Nenhum dado retornado.");
+    }
+  } catch (error) {
+    console.error("Erro ao importar os dados de chuva:", error);
+    this.$toast.error("Erro ao importar os dados de chuva.");
+  } finally {
+    this.carregando = false; // Desativa o estado de carregamento após a conclusão
+  }
+},
+
+
+
 
     atualizarPosto() {
       console.log("Município selecionado:", this.dadosChuva.municipio);
@@ -2258,12 +2276,19 @@ export default {
     },
 
     handleClick(acao, item) {
-      if (acao === "chuva") {
-        this.dialogoChuva = true;
-        this.dadosChuva.municipio = item.municipio; // Preenche o município com o valor do item
-        this.atualizarPosto(); // Atualiza a estação pluviométrica com base no município selecionado
-      }
-    },
+    if (acao === "chuva") {
+      this.dialogoChuva = true; // Abre o modal
+      this.dadosChuva.municipio = item.municipio; // Preenche o município com o valor do item
+      this.idAcude = item.id; // Captura o ID do açude
+
+      // Adiciona o ID do açude na URL
+      const url = new URL(window.location.href);
+      url.searchParams.set('idAcude', this.idAcude);
+      window.history.pushState({}, '', url); // Atualiza a URL sem recarregar a página
+
+      this.atualizarPosto(); // Atualiza a estação pluviométrica com base no município selecionado
+    }
+  },
 
     async salvarDadosChuva() {
       // Verifique se há dados para salvar
@@ -2391,12 +2416,19 @@ export default {
         this.novoAcude.coeficienteTanque !== null;
     },
     handleClick(acao, item) {
-      if (acao === "chuva") {
-        this.dialogoChuva = true;
-        this.dadosChuva.municipio = item.municipio; // Preenche o município com o valor do item
-        this.atualizarPosto(); // Atualiza a estação pluviométrica (posto) com base no município
-      }
-    },
+     if (acao === "chuva") {
+      this.dialogoChuva = true; // Abre o modal
+      this.dadosChuva.municipio = item.municipio; // Preenche o município com o valor do item
+      this.idAcude = item.id; // Captura o ID do açude
+
+      // Adiciona o ID do açude na URL
+      const url = new URL(window.location.href);
+      url.searchParams.set('idAcude', this.idAcude);
+      window.history.pushState({}, '', url); // Atualiza a URL sem recarregar a página
+
+      this.atualizarPosto(); // Atualiza a estação pluviométrica com base no município selecionado
+    }
+  },
 
     fecharModalChuva() {
       this.dialogoChuva = false;
