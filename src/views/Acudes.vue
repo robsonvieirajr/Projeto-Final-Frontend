@@ -13,21 +13,30 @@
           <v-card class="custom-card">
             <!-- Título centralizado -->
             <v-card-title class="headline custom-card-title" style="text-align: center;">
-              Dados de Vazão: Ano {{ anoVazao }}
+              Dados de Vazão
             </v-card-title>
 
             <v-card-text>
               <v-form>
                 <v-container>
-                  <!-- Loop para exibir os meses e campos de vazão -->
-                  <v-row v-for="(vazao, index) in vazoes" :key="index" class="py-2">
-                    <v-col cols="4">
-                      <v-text-field v-model="vazao.mesVazao" label="Mês" readonly></v-text-field>
-                    </v-col>
-                    <v-col cols="8">
-                      <v-text-field v-model="vazao.valorVazao" label="Valor da Vazão (m³)"></v-text-field>
-                    </v-col>
-                  </v-row>
+                  <!-- Loop para exibir os anos -->
+                  <template v-for="(vazoesPorAno, ano) in vazoesAgrupadasPorAno" :key="ano">
+                    <v-row class="py-2">
+                      <v-col cols="12">
+                        <h3>Ano: {{ ano }}</h3>
+                      </v-col>
+                    </v-row>
+
+                    <!-- Loop para exibir os meses e campos de vazão dentro de cada ano -->
+                    <v-row v-for="(vazao, index) in vazoesPorAno" :key="index" class="py-2">
+                      <v-col cols="4">
+                        <v-text-field v-model="vazao.mesVazao" label="Mês" readonly></v-text-field>
+                      </v-col>
+                      <v-col cols="8">
+                        <v-text-field v-model="vazao.valorVazao" label="Valor da Vazão (m³)"></v-text-field>
+                      </v-col>
+                    </v-row>
+                  </template>
                 </v-container>
               </v-form>
             </v-card-text>
@@ -40,27 +49,32 @@
           </v-card>
         </v-dialog>
 
+
         <!-- Modal para listar evaporação -->
         <v-dialog v-model="dialogEvaporacao" max-width="700px" class="custom-dialog">
           <v-card class="custom-card">
             <!-- Título centralizado -->
             <v-card-title class="headline custom-card-title" style="text-align: center;">
-              Dados de Evaporação: Ano {{ anoEvaporacao }}
+              Dados de Evaporação
             </v-card-title>
 
             <v-card-text>
               <v-form>
                 <v-container>
-                  <!-- Loop para exibir os meses e campos de evaporação -->
-                  <v-row v-for="(evaporacao, index) in evaporacoes" :key="index" class="py-2">
-                    <v-col cols="4">
-                      <v-text-field v-model="evaporacao.mesEvaporacao" label="Mês" readonly></v-text-field>
-                    </v-col>
-                    <v-col cols="8">
-                      <v-text-field v-model="evaporacao.valorEvaporacao"
-                        label="Valor da Evaporação (m³)"></v-text-field>
-                    </v-col>
-                  </v-row>
+                  <!-- Loop para exibir os anos -->
+                  <div v-for="(evaporacoes, ano) in evaporacoesAgrupadasPorAno" :key="ano">
+                    <h3>Ano: {{ ano }}</h3>
+                    <!-- Loop para exibir os meses e campos de evaporação dentro do ano -->
+                    <v-row v-for="(evaporacao, index) in evaporacoes" :key="index" class="py-2">
+                      <v-col cols="4">
+                        <v-text-field v-model="evaporacao.mesEvaporacao" label="Mês" readonly></v-text-field>
+                      </v-col>
+                      <v-col cols="8">
+                        <v-text-field v-model="evaporacao.valorEvaporacao"
+                          label="Valor da Evaporação (m³)"></v-text-field>
+                      </v-col>
+                    </v-row>
+                  </div>
                 </v-container>
               </v-form>
             </v-card-text>
@@ -72,11 +86,6 @@
             </v-card-actions>
           </v-card>
         </v-dialog>
-
-
-
-
-
 
 
         <!-- Modal para cadastrar açudes -->
@@ -2028,7 +2037,11 @@ export default {
       anoVazao: "", // Armazena o ano para exibição
       dialogVazao: false, // Controla o modal de vazão
       dialogEvaporacao: false, // Controla o modal de evaporação
+      evaporacoes: [],
+      evaporacoesAgrupadasPorAno: {},
+      anoEvaporacao: null,
       vazoes: [], // Dados de vazão
+      vazoesAgrupadasPorAno: {},
       evaporacoes: [], // Dados de evaporação
       anoVazao: null,
       anoEvaporacao: null,
@@ -2153,21 +2166,41 @@ export default {
     },
     // Função que busca os dados de evaporação por ID do açude
     async buscarEvaporacao(idAcude) {
-      try {
-        const response = await acudeService.listarEvaporacoesPorIdAcude(idAcude);
-        if (response && response.objeto) {
-          this.evaporacoes = response.objeto; // Armazena os dados de evaporação retornados
-          if (response.objeto.length > 0) {
-            this.anoEvaporacao = response.objeto[0].anoEvaporacao; // Definindo o ano para exibir
-          }
-          console.log('Dados de evaporação recebidos:', this.evaporacoes);
-        } else {
-          console.error("Nenhuma evaporação encontrada.");
-        }
-      } catch (error) {
-        console.error("Erro ao buscar dados de evaporação:", error);
+  try {
+    const response = await acudeService.listarEvaporacoesPorIdAcude(idAcude);
+    if (response && response.objeto) {
+      this.evaporacoes = response.objeto; // Armazena os dados de evaporação retornados
+
+      // Agrupa os dados de evaporação por ano
+      this.evaporacoesAgrupadasPorAno = this.agruparEvaporacoesPorAno(this.evaporacoes);
+
+      // Define o primeiro ano encontrado como padrão para exibição
+      if (Object.keys(this.evaporacoesAgrupadasPorAno).length > 0) {
+        this.anoEvaporacao = Object.keys(this.evaporacoesAgrupadasPorAno)[0]; // Primeiro ano como padrão
       }
+
+      console.log('Dados de evaporação agrupados por ano:', this.evaporacoesAgrupadasPorAno);
+    } else {
+      console.error("Nenhuma evaporação encontrada.");
+    }
+  } catch (error) {
+    console.error("Erro ao buscar dados de evaporação:", error);
+  }
+},
+
+    // Função para agrupar evaporações por ano
+    agruparEvaporacoesPorAno(evaporacoes) {
+      return evaporacoes.reduce((acc, evaporacao) => {
+        const ano = evaporacao.anoEvaporacao;
+        if (!acc[ano]) {
+          acc[ano] = [];
+        }
+        acc[ano].push(evaporacao);
+        return acc;
+      }, {});
     },
+
+
 
 
     async buscarVazao(idAcude) {
@@ -2175,10 +2208,16 @@ export default {
         const response = await acudeService.listarVazoesPorIdAcude(idAcude);
         if (response && response.objeto) {
           this.vazoes = response.objeto; // Armazena os dados de vazão retornados
-          if (response.objeto.length > 0) {
-            this.anoVazao = response.objeto[0].anoVazao; // Definindo o ano para exibir
+
+          // Agrupa os dados de vazão por ano
+          this.vazoesAgrupadasPorAno = this.agruparVazoesPorAno(this.vazoes);
+
+          // Define o ano para exibir no título, como o primeiro ano encontrado
+          if (Object.keys(this.vazoesAgrupadasPorAno).length > 0) {
+            this.anoVazao = Object.keys(this.vazoesAgrupadasPorAno)[0]; // Define o primeiro ano como padrão
           }
-          console.log('Dados de vazão recebidos:', this.vazoes);
+
+          console.log('Dados de vazão agrupados por ano:', this.vazoesAgrupadasPorAno);
         } else {
           console.error("Nenhuma vazão encontrada.");
         }
@@ -2186,6 +2225,18 @@ export default {
         console.error("Erro ao buscar dados de vazão:", error);
       }
     },
+    agruparVazoesPorAno(vazoes) {
+      return vazoes.reduce((acc, vazao) => {
+        const ano = vazao.anoVazao;
+        if (!acc[ano]) {
+          acc[ano] = [];
+        }
+        acc[ano].push(vazao);
+        return acc;
+      }, {});
+    },
+
+
     async salvarVazao() {
       try {
         // Prepara os dados das vazões para enviar ao backend
@@ -2229,7 +2280,7 @@ export default {
     },
     async salvarEvaporacao() {
       try {
-       
+        // Prepara os dados das evaporações para enviar ao backend
         const dadosParaSalvar = this.evaporacoes.map(evaporacao => ({
           id: evaporacao.id,
           id_acude: evaporacao.id_acude,
@@ -2238,8 +2289,8 @@ export default {
           anoEvaporacao: evaporacao.anoEvaporacao,
         }));
 
-      
-        console.log("Dados para salvar:", dadosParaSalvar);
+        // Verifica os dados que serão enviados ao backend
+        console.log("Dados de evaporação para salvar:", dadosParaSalvar);
 
         // Chama o serviço que faz a atualização
         await acudeService.editarEvaporacoes(dadosParaSalvar);
@@ -2268,7 +2319,6 @@ export default {
         }
       }
     },
-
     atualizarPosto() {
       console.log("Município selecionado:", this.dadosChuva.municipio);
       console.log("Lista de municípios:", this.municipiosPostos);
@@ -2323,22 +2373,21 @@ export default {
         console.log('Abrindo modal de vazão para o açude ID:', item.id);
         this.dialog = true; // Abre o modal de vazão
         console.log('Valor de dialog após abrir modal:', this.dialog);
-        this.buscarVazao(item.id); // Chama a função para buscar os dados de vazão
+
+        // Chama a função para buscar os dados de vazão e fazer o agrupamento por ano
+        this.buscarVazao(item.id);
       }
     },
+
     // Função que abre o modal e busca os dados de evaporação
     abreModalEvaporacao(acao, item) {
-      if (acao === 'evaporacao') {
-        console.log('Abrindo modal de evaporação para o açude ID:', item.id);
-        this.dialogEvaporacao = true; // Abre o modal de evaporação
-        console.log('Valor de dialogEvaporacao após abrir modal:', this.dialogEvaporacao);
-        this.buscarEvaporacao(item.id); // Chama a função para buscar os dados de evaporação
-      }
-    },
-
-
-
-
+  if (acao === 'evaporacao') {
+    console.log('Abrindo modal de evaporação para o açude ID:', item.id);
+    this.dialogEvaporacao = true; // Abre o modal de evaporação
+    console.log('Valor de dialogEvaporacao após abrir modal:', this.dialogEvaporacao);
+    this.buscarEvaporacao(item.id); // Chama a função para buscar os dados de evaporação
+  }
+},
 
     async salvarDadosChuva() {
       // Verifique se há dados para salvar
