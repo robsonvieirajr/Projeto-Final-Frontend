@@ -8,37 +8,72 @@
           <v-btn class="btn-rounded btn-primary" @click="abrirModal">Cadastrar Açudes</v-btn>
         </div>
 
-     <!-- Modal para listar vazão -->
-     <v-dialog v-model="dialog" max-width="700px" class="custom-dialog">
-  <v-card class="custom-card">
-    <!-- Título centralizado -->
-    <v-card-title class="headline custom-card-title" style="text-align: center;">
-      Dados de Vazão:  Ano {{ anoVazao }}
-    </v-card-title>
+        <!-- Modal para listar vazão -->
+        <v-dialog v-model="dialog" max-width="700px" class="custom-dialog">
+          <v-card class="custom-card">
+            <!-- Título centralizado -->
+            <v-card-title class="headline custom-card-title" style="text-align: center;">
+              Dados de Vazão: Ano {{ anoVazao }}
+            </v-card-title>
 
-    <v-card-text>
-      <v-form>
-        <v-container>
-          <!-- Loop para exibir os meses e campos de vazão -->
-          <v-row v-for="(vazao, index) in vazoes" :key="index" class="py-2">
-            <v-col cols="4">
-              <v-text-field v-model="vazao.mesVazao" label="Mês" readonly></v-text-field>
-            </v-col>
-            <v-col cols="8">
-              <v-text-field v-model="vazao.valorVazao" label="Valor da Vazão (m³)"></v-text-field>
-            </v-col>
-          </v-row>
-        </v-container>
-      </v-form>
-    </v-card-text>
+            <v-card-text>
+              <v-form>
+                <v-container>
+                  <!-- Loop para exibir os meses e campos de vazão -->
+                  <v-row v-for="(vazao, index) in vazoes" :key="index" class="py-2">
+                    <v-col cols="4">
+                      <v-text-field v-model="vazao.mesVazao" label="Mês" readonly></v-text-field>
+                    </v-col>
+                    <v-col cols="8">
+                      <v-text-field v-model="vazao.valorVazao" label="Valor da Vazão (m³)"></v-text-field>
+                    </v-col>
+                  </v-row>
+                </v-container>
+              </v-form>
+            </v-card-text>
 
-    <v-card-actions>
-      <v-spacer></v-spacer>
-      <v-btn class="btn-rounded btn-outline" @click="fecharModalVazao">Cancelar</v-btn>
-      <v-btn class="btn-rounded btn-primary" @click="salvarVazao">Salvar</v-btn>
-    </v-card-actions>
-  </v-card>
-</v-dialog>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn class="btn-rounded btn-outline" @click="fecharModalVazao">Cancelar</v-btn>
+              <v-btn class="btn-rounded btn-primary" @click="salvarVazao">Salvar</v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+
+        <!-- Modal para listar evaporação -->
+        <v-dialog v-model="dialogEvaporacao" max-width="700px" class="custom-dialog">
+          <v-card class="custom-card">
+            <!-- Título centralizado -->
+            <v-card-title class="headline custom-card-title" style="text-align: center;">
+              Dados de Evaporação: Ano {{ anoEvaporacao }}
+            </v-card-title>
+
+            <v-card-text>
+              <v-form>
+                <v-container>
+                  <!-- Loop para exibir os meses e campos de evaporação -->
+                  <v-row v-for="(evaporacao, index) in evaporacoes" :key="index" class="py-2">
+                    <v-col cols="4">
+                      <v-text-field v-model="evaporacao.mesEvaporacao" label="Mês" readonly></v-text-field>
+                    </v-col>
+                    <v-col cols="8">
+                      <v-text-field v-model="evaporacao.valorEvaporacao"
+                        label="Valor da Evaporação (m³)"></v-text-field>
+                    </v-col>
+                  </v-row>
+                </v-container>
+              </v-form>
+            </v-card-text>
+
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn class="btn-rounded btn-outline" @click="fecharModalEvaporacao">Cancelar</v-btn>
+              <v-btn class="btn-rounded btn-primary" @click="salvarEvaporacao">Salvar</v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+
+
 
 
 
@@ -131,10 +166,10 @@
                         { text: 'Mês', value: 'mes' },
                         { text: 'Valor (mm)', value: 'valor' },
                       ]" :items="ano.dadosMensais.map((item) => ({
-                          ...item,
-                          valor: `${item.valor} mm`,
-                        }))
-                          " hide-default-footer class="elevation-1" :items-per-page="12" dense></v-data-table>
+                        ...item,
+                        valor: `${item.valor} mm`,
+                      }))
+                        " hide-default-footer class="elevation-1" :items-per-page="12" dense></v-data-table>
                     </v-row>
                   </v-col>
                 </v-row>
@@ -167,11 +202,11 @@
                   <v-col cols="6">
                     <label for="municipio">Município</label>
                     <v-select v-model="dadosChuva.municipio" :items="municipiosPostos
-                        .map((item) => item.municipio)
-                        .filter(
-                          (value, index, self) =>
-                            self.indexOf(value) === index
-                        )
+                      .map((item) => item.municipio)
+                      .filter(
+                        (value, index, self) =>
+                          self.indexOf(value) === index
+                      )
                       " label="Selecione o município" @change="atualizarPosto" required></v-select>
                   </v-col>
 
@@ -245,21 +280,12 @@
           </v-card-text>
         </v-card>
 
-        <v-snackbar
-    v-model="snackbar"
-    :timeout="3000"
-    bottom
-    right
-  >
-    {{ snackbarMessage }}
-    <v-btn
-      color="red"
-      text
-      @click="snackbar = false"
-    >
-      Fechar
-    </v-btn>
-  </v-snackbar>
+        <v-snackbar v-model="snackbar" :timeout="3000" bottom right>
+          {{ snackbarMessage }}
+          <v-btn color="red" text @click="snackbar = false">
+            Fechar
+          </v-btn>
+        </v-snackbar>
 
         <!-- Indicador de carregamento -->
         <div v-if="carregando" class="overlay">
@@ -311,7 +337,7 @@
                   <td class="text-center">
                     <v-icon small @click="handleClick('chuva', item)" color="blue">mdi-weather-rainy</v-icon>
                     <v-icon small @click="abreModalVazao('vazao', item)" color="blue">mdi-waves</v-icon>
-                    <v-icon small @click="handleClick('evaporacao', item)" color="blue">mdi-thermometer</v-icon>
+                    <v-icon small @click="abreModalEvaporacao('evaporacao', item)" color="blue">mdi-thermometer</v-icon>
                     <div class="icon-cav" @click="handleClick('cotaAreaVolume', item)">
                       CAV
                     </div>
@@ -2000,6 +2026,12 @@ export default {
       dialog: false, // Controla o modal de vazão
       vazoes: [], // Aqui serão armazenados os dados de vazão por mês
       anoVazao: "", // Armazena o ano para exibição
+      dialogVazao: false, // Controla o modal de vazão
+      dialogEvaporacao: false, // Controla o modal de evaporação
+      vazoes: [], // Dados de vazão
+      evaporacoes: [], // Dados de evaporação
+      anoVazao: null,
+      anoEvaporacao: null,
       dialogoChuvaImportada: false, // controla o modal de chuva importada
       dialogoChuva: false,
       dialogoSucesso: false,
@@ -2072,114 +2104,172 @@ export default {
       }
     },
     async importarDadosChuva() {
-  try {
-    this.carregando = true; // Ativa o estado de carregamento
+      try {
+        this.carregando = true; // Ativa o estado de carregamento
 
-    const { municipio, estacao, dataInicial, dataFinal } = this.dadosChuva;
+        const { municipio, estacao, dataInicial, dataFinal } = this.dadosChuva;
 
-    // Captura o idAcude da URL
-    const urlParams = new URLSearchParams(window.location.search);
-    console.log("URL Params:", urlParams); // Adiciona log para inspecionar os parâmetros
-    const idAcude = urlParams.get('idAcude'); // Obtém o idAcude da URL
+        // Captura o idAcude da URL
+        const urlParams = new URLSearchParams(window.location.search);
+        console.log("URL Params:", urlParams); // Adiciona log para inspecionar os parâmetros
+        const idAcude = urlParams.get('idAcude'); // Obtém o idAcude da URL
 
-    console.log("ID do Açude capturado:", idAcude); // Verificação do valor capturado
+        console.log("ID do Açude capturado:", idAcude); // Verificação do valor capturado
 
-    if (!idAcude) {
-      this.$toast.error("ID do açude não encontrado.");
-      this.carregando = false;
-      return;
-    }
-
-    // Envia a requisição com o idAcude incluído
-    const response = await acudeService.importarChuvas(
-      municipio,
-      estacao,
-      dataInicial,
-      dataFinal,
-      idAcude // Inclui o idAcude na requisição
-    );
-
-    // Verifica se há dados e define os dados no frontend
-    if (response && response.objeto && response.objeto.length > 0) {
-      this.dadosChuvaImportados = response.objeto;
-      console.log("Dados de chuva importados:", this.dadosChuvaImportados); // Verificação dos dados
-      
-      // Aqui você abre o modal de importação dos dados, caso precise
-      this.dialogoChuvaImportada = true;
-
-      // Fechar o modal de importação ao final do processo
-      this.dialogoChuva = false; // Fecha o modal principal de importação
-    } else {
-      this.$toast.error("Nenhum dado retornado.");
-    }
-  } catch (error) {
-    console.error("Erro ao importar os dados de chuva:", error);
-    this.$toast.error("Erro ao importar os dados de chuva.");
-  } finally {
-    this.carregando = false; // Desativa o estado de carregamento após a conclusão
-  }
-},
-
-async buscarVazao(idAcude) {
-    try {
-      const response = await acudeService.listarVazoesPorIdAcude(idAcude);
-      if (response && response.objeto) {
-        this.vazoes = response.objeto; // Armazena os dados de vazão retornados
-        if (response.objeto.length > 0) {
-          this.anoVazao = response.objeto[0].anoVazao; // Definindo o ano para exibir
+        if (!idAcude) {
+          this.$toast.error("ID do açude não encontrado.");
+          this.carregando = false;
+          return;
         }
-        console.log('Dados de vazão recebidos:', this.vazoes);
-      } else {
-        console.error("Nenhuma vazão encontrada.");
+
+        // Envia a requisição com o idAcude incluído
+        const response = await acudeService.importarChuvas(
+          municipio,
+          estacao,
+          dataInicial,
+          dataFinal,
+          idAcude // Inclui o idAcude na requisição
+        );
+
+        // Verifica se há dados e define os dados no frontend
+        if (response && response.objeto && response.objeto.length > 0) {
+          this.dadosChuvaImportados = response.objeto;
+          console.log("Dados de chuva importados:", this.dadosChuvaImportados); // Verificação dos dados
+
+          // Aqui você abre o modal de importação dos dados, caso precise
+          this.dialogoChuvaImportada = true;
+
+          // Fechar o modal de importação ao final do processo
+          this.dialogoChuva = false; // Fecha o modal principal de importação
+        } else {
+          this.$toast.error("Nenhum dado retornado.");
+        }
+      } catch (error) {
+        console.error("Erro ao importar os dados de chuva:", error);
+        this.$toast.error("Erro ao importar os dados de chuva.");
+      } finally {
+        this.carregando = false; // Desativa o estado de carregamento após a conclusão
       }
-    } catch (error) {
-      console.error("Erro ao buscar dados de vazão:", error);
-    }
-  },
-  async salvarVazao() {
-  try {
-    // Prepara os dados das vazões para enviar ao backend
-    const dadosParaSalvar = this.vazoes.map(vazao => ({
-      id: vazao.id,
-      id_acude: vazao.id_acude,
-      valorVazao: parseFloat(vazao.valorVazao) || 0, // Garante que o valor seja numérico
-      mesVazao: vazao.mesVazao,
-      anoVazao: vazao.anoVazao,
-    }));
+    },
+    // Função que busca os dados de evaporação por ID do açude
+    async buscarEvaporacao(idAcude) {
+      try {
+        const response = await acudeService.listarEvaporacoesPorIdAcude(idAcude);
+        if (response && response.objeto) {
+          this.evaporacoes = response.objeto; // Armazena os dados de evaporação retornados
+          if (response.objeto.length > 0) {
+            this.anoEvaporacao = response.objeto[0].anoEvaporacao; // Definindo o ano para exibir
+          }
+          console.log('Dados de evaporação recebidos:', this.evaporacoes);
+        } else {
+          console.error("Nenhuma evaporação encontrada.");
+        }
+      } catch (error) {
+        console.error("Erro ao buscar dados de evaporação:", error);
+      }
+    },
 
-    // Verifica os dados que serão enviados ao backend
-    console.log("Dados para salvar:", dadosParaSalvar);
 
-    // Chama o serviço que faz a atualização
-    await acudeService.editarVazoes(dadosParaSalvar);
+    async buscarVazao(idAcude) {
+      try {
+        const response = await acudeService.listarVazoesPorIdAcude(idAcude);
+        if (response && response.objeto) {
+          this.vazoes = response.objeto; // Armazena os dados de vazão retornados
+          if (response.objeto.length > 0) {
+            this.anoVazao = response.objeto[0].anoVazao; // Definindo o ano para exibir
+          }
+          console.log('Dados de vazão recebidos:', this.vazoes);
+        } else {
+          console.error("Nenhuma vazão encontrada.");
+        }
+      } catch (error) {
+        console.error("Erro ao buscar dados de vazão:", error);
+      }
+    },
+    async salvarVazao() {
+      try {
+        // Prepara os dados das vazões para enviar ao backend
+        const dadosParaSalvar = this.vazoes.map(vazao => ({
+          id: vazao.id,
+          id_acude: vazao.id_acude,
+          valorVazao: parseFloat(vazao.valorVazao) || 0, // Garante que o valor seja numérico
+          mesVazao: vazao.mesVazao,
+          anoVazao: vazao.anoVazao,
+        }));
 
-    // Exibe o Snackbar personalizado com a mensagem de sucesso
-    this.snackbarMessage = "Dados de vazão salvo com sucesso!";
-    this.snackbar = true;
+        // Verifica os dados que serão enviados ao backend
+        console.log("Dados para salvar:", dadosParaSalvar);
+
+        // Chama o serviço que faz a atualização
+        await acudeService.editarVazoes(dadosParaSalvar);
+
+        // Exibe o Snackbar personalizado com a mensagem de sucesso
+        this.snackbarMessage = "Dados de vazão salvo com sucesso!";
+        this.snackbar = true;
 
         // Fecha o modal após salvar
-    this.dialog = false;
+        this.dialog = false;
 
-    // Garante que o modal seja fechado forçando atualização da interface
-    await this.$nextTick();  // Espera até que o DOM seja atualizado antes de forçar a atualização
+        // Garante que o modal seja fechado forçando atualização da interface
+        await this.$nextTick();  // Espera até que o DOM seja atualizado antes de forçar a atualização
 
-    // Força a atualização da interface para garantir que o modal feche
-    this.$forceUpdate();
+        // Força a atualização da interface para garantir que o modal feche
+        this.$forceUpdate();
 
-  } catch (error) {
-    console.error("Erro ao salvar as vazões:", error);
+      } catch (error) {
+        console.error("Erro ao salvar as vazões:", error);
 
-    // Tratamento para exibir uma mensagem de erro
-    if (error.response && error.response.data && error.response.data.message) {
-      this.$toast.error(error.response.data.message);
-    } else {
-      this.$toast.error("Erro ao salvar as vazões.");
-    }
-  }
-},
+        // Tratamento para exibir uma mensagem de erro
+        if (error.response && error.response.data && error.response.data.message) {
+          this.$toast.error(error.response.data.message);
+        } else {
+          this.$toast.error("Erro ao salvar as vazões.");
+        }
+      }
+    },
+    async salvarEvaporacao() {
+      try {
+       
+        const dadosParaSalvar = this.evaporacoes.map(evaporacao => ({
+          id: evaporacao.id,
+          id_acude: evaporacao.id_acude,
+          valorEvaporacao: parseFloat(evaporacao.valorEvaporacao) || 0, // Garante que o valor seja numérico
+          mesEvaporacao: evaporacao.mesEvaporacao,
+          anoEvaporacao: evaporacao.anoEvaporacao,
+        }));
 
+      
+        console.log("Dados para salvar:", dadosParaSalvar);
 
-atualizarPosto() {
+        // Chama o serviço que faz a atualização
+        await acudeService.editarEvaporacoes(dadosParaSalvar);
+
+        // Exibe o Snackbar personalizado com a mensagem de sucesso
+        this.snackbarMessage = "Dados de evaporação salvos com sucesso!";
+        this.snackbar = true;
+
+        // Fecha o modal após salvar
+        this.dialogEvaporacao = false;
+
+        // Garante que o modal seja fechado forçando atualização da interface
+        await this.$nextTick();  // Espera até que o DOM seja atualizado antes de forçar a atualização
+
+        // Força a atualização da interface para garantir que o modal feche
+        this.$forceUpdate();
+
+      } catch (error) {
+        console.error("Erro ao salvar as evaporações:", error);
+
+        // Tratamento para exibir uma mensagem de erro
+        if (error.response && error.response.data && error.response.data.message) {
+          this.$toast.error(error.response.data.message);
+        } else {
+          this.$toast.error("Erro ao salvar as evaporações.");
+        }
+      }
+    },
+
+    atualizarPosto() {
       console.log("Município selecionado:", this.dadosChuva.municipio);
       console.log("Lista de municípios:", this.municipiosPostos);
 
@@ -2209,97 +2299,109 @@ atualizarPosto() {
       // Limpar o campo de estação para forçar o usuário a escolher um novo posto
       this.dadosChuva.estacao = null;
 
-     
-      
+
+
     },
 
     handleClick(acao, item) {
-  if (acao === "chuva") {
+      if (acao === "chuva") {
         this.dialogoChuva = true; // Abre o modal
         this.dadosChuva.municipio = item.municipio; // Preenche o município com o valor do item
-    this.idAcude = item.id; // Captura o ID do açude
+        this.idAcude = item.id; // Captura o ID do açude
 
         // Adiciona o ID do açude na URL
-    const url = new URL(window.location.href);
-    url.searchParams.set('idAcude', this.idAcude);
+        const url = new URL(window.location.href);
+        url.searchParams.set('idAcude', this.idAcude);
         window.history.pushState({}, '', url); // Atualiza a URL sem recarregar a página
 
         this.atualizarPosto(); // Atualiza a estação pluviométrica com base no município selecionado
-  }
-},
- // Função que abre o modal e busca os dados de vazão
- abreModalVazao(acao, item) {
-  if (acao === 'vazao') {
-    console.log('Abrindo modal de vazão para o açude ID:', item.id);
-    this.dialog = true; // Abre o modal de vazão
-    console.log('Valor de dialog após abrir modal:', this.dialog);
-    this.buscarVazao(item.id); // Chama a função para buscar os dados de vazão
-  }
-},
+      }
+    },
+    // Função que abre o modal e busca os dados de vazão
+    abreModalVazao(acao, item) {
+      if (acao === 'vazao') {
+        console.log('Abrindo modal de vazão para o açude ID:', item.id);
+        this.dialog = true; // Abre o modal de vazão
+        console.log('Valor de dialog após abrir modal:', this.dialog);
+        this.buscarVazao(item.id); // Chama a função para buscar os dados de vazão
+      }
+    },
+    // Função que abre o modal e busca os dados de evaporação
+    abreModalEvaporacao(acao, item) {
+      if (acao === 'evaporacao') {
+        console.log('Abrindo modal de evaporação para o açude ID:', item.id);
+        this.dialogEvaporacao = true; // Abre o modal de evaporação
+        console.log('Valor de dialogEvaporacao após abrir modal:', this.dialogEvaporacao);
+        this.buscarEvaporacao(item.id); // Chama a função para buscar os dados de evaporação
+      }
+    },
+
+
+
 
 
     async salvarDadosChuva() {
-  // Verifique se há dados para salvar
-  if (!this.dadosChuvaImportados || this.dadosChuvaImportados.length === 0) {
-    this.$toast.error("Nenhum dado de chuva para salvar.");
-    return;
-  }
+      // Verifique se há dados para salvar
+      if (!this.dadosChuvaImportados || this.dadosChuvaImportados.length === 0) {
+        this.$toast.error("Nenhum dado de chuva para salvar.");
+        return;
+      }
 
-  // Obtenha o idAcude diretamente da URL
-  const urlParams = new URLSearchParams(window.location.search);
-  const idAcude = urlParams.get('idAcude'); // Verificar se o idAcude está na URL
+      // Obtenha o idAcude diretamente da URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const idAcude = urlParams.get('idAcude'); // Verificar se o idAcude está na URL
 
-  // Se o idAcude estiver indefinido, exiba uma mensagem de erro
-  if (!idAcude) {
-    this.$toast.error("ID do Açude não encontrado.");
-    return;
-  }
+      // Se o idAcude estiver indefinido, exiba uma mensagem de erro
+      if (!idAcude) {
+        this.$toast.error("ID do Açude não encontrado.");
+        return;
+      }
 
-  // Log para verificar o ID do Açude
-  console.log("ID do Açude:", idAcude);
+      // Log para verificar o ID do Açude
+      console.log("ID do Açude:", idAcude);
 
-  // Prepare os dados no formato esperado pelo backend
-  const dadosParaSalvar = this.dadosChuvaImportados.map(dado => ({
-    idAcude: idAcude, // Usar o idAcude obtido da URL
-    municipio: dado.municipio,
-    estacao: dado.estacao,
-    anosMensais: dado.anosMensais.map(ano => ({
-      ano: ano.ano,
-      chuvaPorMes: ano.dadosMensais.reduce((acc, item) => {
-        acc[item.mes] = parseFloat(String(item.valor).replace(' mm', '')); // Corrigir o formato dos valores
-        return acc;
-      }, {}),
-    })),
-  }));
+      // Prepare os dados no formato esperado pelo backend
+      const dadosParaSalvar = this.dadosChuvaImportados.map(dado => ({
+        idAcude: idAcude, // Usar o idAcude obtido da URL
+        municipio: dado.municipio,
+        estacao: dado.estacao,
+        anosMensais: dado.anosMensais.map(ano => ({
+          ano: ano.ano,
+          chuvaPorMes: ano.dadosMensais.reduce((acc, item) => {
+            acc[item.mes] = parseFloat(String(item.valor).replace(' mm', '')); // Corrigir o formato dos valores
+            return acc;
+          }, {}),
+        })),
+      }));
 
-  // Verifique os dados que serão enviados ao backend
-  console.log("Dados para salvar:", dadosParaSalvar);
+      // Verifique os dados que serão enviados ao backend
+      console.log("Dados para salvar:", dadosParaSalvar);
 
-  try {
-    // Chama o serviço para salvar os dados de chuva no backend
-    const response = await acudeService.salvarChuvas(dadosParaSalvar);
+      try {
+        // Chama o serviço para salvar os dados de chuva no backend
+        const response = await acudeService.salvarChuvas(dadosParaSalvar);
 
-    // Exibe o Snackbar personalizado com a mensagem de sucesso
-    this.snackbarMessage = "Dados de chuva foram salvos com sucesso!";
-    this.snackbar = true;
+        // Exibe o Snackbar personalizado com a mensagem de sucesso
+        this.snackbarMessage = "Dados de chuva foram salvos com sucesso!";
+        this.snackbar = true;
 
-    // Fechar o modal após salvar com sucesso
-    this.dialogoChuvaImportada = false;
+        // Fechar o modal após salvar com sucesso
+        this.dialogoChuvaImportada = false;
 
-    // Forçar a atualização da interface para garantir que o modal feche
-    this.$forceUpdate();
+        // Forçar a atualização da interface para garantir que o modal feche
+        this.$forceUpdate();
 
-  } catch (error) {
-    console.error("Erro ao salvar os dados de chuva:", error);
+      } catch (error) {
+        console.error("Erro ao salvar os dados de chuva:", error);
 
-    // Tratamento para casos em que a resposta de erro não possui a estrutura esperada
-    if (error.response && error.response.data && error.response.data.message) {
-      this.$toast.error(error.response.data.message);
-    } else {
-      this.$toast.error("Erro ao salvar os dados de chuva.");
-    }
-  }
-},
+        // Tratamento para casos em que a resposta de erro não possui a estrutura esperada
+        if (error.response && error.response.data && error.response.data.message) {
+          this.$toast.error(error.response.data.message);
+        } else {
+          this.$toast.error("Erro ao salvar os dados de chuva.");
+        }
+      }
+    },
 
 
 
@@ -2334,9 +2436,13 @@ atualizarPosto() {
       this.dialogo = true;
     },
     fecharModalVazao() {
-  this.dialog = false; // Controla o fechamento do modal de vazão
-  this.vazoes = [];    // Limpa os dados de vazões
-},
+      this.dialog = false; // Controla o fechamento do modal de vazão
+      this.vazoes = [];    // Limpa os dados de vazões
+    },
+    fecharModalEvaporacao() {
+      this.dialogEvaporacao = false; // Controla o fechamento do modal de vazão
+      this.vazoes = [];    // Limpa os dados de vazões
+    },
     fecharModal() {
       this.dialogo = false;
       this.novoAcude = {

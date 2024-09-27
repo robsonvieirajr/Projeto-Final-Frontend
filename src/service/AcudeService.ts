@@ -7,6 +7,7 @@ import { ChuvaData } from "../model/Chuva";
 const API_URL = "http://localhost:8080/api/v1/acude";
 const API_URL_CHUVA = "http://localhost:8080/api/v1/chuva"
 const API_URL_VAZAO = "http://localhost:8080/api/v1/vazao";
+const API_URL_EVAPORACAO = "http://localhost:8080/api/v1/evaporacao"
 
 const acudeService = {
   async listarTodosAcudes(nome: string) {
@@ -141,7 +142,40 @@ async editarVazoes(vazoes) {
     console.error("Erro ao editar vazões:", error);
     throw new Error(error.response?.data?.message || "Erro ao editar vazões");
   }
+},
+// Função para listar evaporações por ID do açude
+async listarEvaporacoesPorIdAcude(idAcude) {
+  try {
+      const response = await axios.get(`${API_URL_EVAPORACAO}/listarEvaporacoesPorIdAcude`, {
+          params: { id_acude: idAcude },
+      });
+
+      // Log para verificar o que foi retornado
+      console.log("Evaporações retornadas:", response.data);
+
+      return response.data;
+  } catch (error) {
+      console.error("Erro ao listar evaporações por ID do açude:", error);
+      throw new Error(error.response?.data?.message || "Erro ao listar evaporações");
+  }
+},
+// Função para editar as evaporações
+async editarEvaporacoes(evaporacoes) {
+  try {
+    const response = await axios.put(`${API_URL_EVAPORACAO}/editarEvaporacoes`, evaporacoes, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    console.log("Resposta da atualização de evaporações:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Erro ao editar evaporações:", error);
+    throw new Error(error.response?.data?.message || "Erro ao editar evaporações");
+  }
 }
+
   
 };
 

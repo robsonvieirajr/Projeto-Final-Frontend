@@ -128,6 +128,48 @@ async editarVazoes(req, res) {
       error: error.message,
     });
   }
+},
+// Endpoint para listar evaporações por ID do açude
+async listarEvaporacoesPorIdAcude(req, res) {
+  const { id_acude } = req.query;
+  try {
+      const evaporacoes = await acudeService.listarEvaporacoesPorIdAcude(id_acude);
+      return res.status(200).json({
+          codigoMensagem: 0,
+          mensagem: "Operação realizada com sucesso!",
+          objeto: evaporacoes,
+          dataServidor: new Date().toISOString(),
+      });
+  } catch (error) {
+      return res.status(500).json({
+          codigoMensagem: 1,
+          mensagem: "Erro ao listar evaporações",
+          error: error.message,
+      });
+  }
+},
+// Controller para realizar a atualização de evaporações
+async editarEvaporacoes(req, res) {
+  try {
+    const evaporacoes = req.body; // Recebe a lista de evaporações que serão atualizadas
+    console.log("Dados recebidos para atualização:", evaporacoes);
+
+    // Chama o serviço que faz a atualização das evaporações no backend
+    await acudeService.editarEvaporacoes(evaporacoes);
+
+    return res.status(200).json({
+      codigoMensagem: 0,
+      mensagem: "Evaporações atualizadas com sucesso!",
+    });
+  } catch (error) {
+    console.error("Erro ao editar evaporações:", error);
+
+    return res.status(500).json({
+      codigoMensagem: 1,
+      mensagem: "Erro ao atualizar evaporações",
+      error: error.message,
+    });
+  }
 }
 
 }
