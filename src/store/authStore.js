@@ -21,14 +21,16 @@ export const useAuthStore = defineStore("auth", {
     },
     logOut() {
       this.isAuthenticated = false;
-      Cookies.remove("token");
-      Cookies.remove("token_expiration");
+      Cookies.remove("token", { path: '/' });
+      Cookies.remove("token_expiration", { path: '/' });
+      console.log("Token e expiração removidos:", !Cookies.get("token"));
       this.expirationTime = null;
       if (this.expirationChecker) {
         clearInterval(this.expirationChecker);
       }
-      router.push("/login"); // Redireciona para a tela de login
+      router.push("/login");
     },
+     
     startTokenExpirationChecker() {
       if (this.expirationChecker) {
         clearInterval(this.expirationChecker);
