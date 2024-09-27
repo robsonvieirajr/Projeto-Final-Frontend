@@ -6,6 +6,7 @@ import { ChuvaData } from "../model/Chuva";
 
 const API_URL = "http://localhost:8080/api/v1/acude";
 const API_URL_CHUVA = "http://localhost:8080/api/v1/chuva"
+const API_URL_VAZAO = "http://localhost:8080/api/v1/vazao";
 
 const acudeService = {
   async listarTodosAcudes(nome: string) {
@@ -107,8 +108,40 @@ const acudeService = {
         throw new Error("Erro desconhecido ao salvar dados de chuvas");
       }
     }
-}
+},
+// Função para listar vazões por ID do açude
+async listarVazoesPorIdAcude(idAcude: number) {
+  try {
+    const response = await axios.get(`${API_URL_VAZAO}/listarVazoesPorIdAcude`, {
+      params: { id_acude: idAcude },
+    });
 
+    // Log para verificar o que foi retornado
+    console.log("Vazões retornadas:", response.data);
+
+    return response.data;
+  } catch (error) {
+    console.error("Erro ao listar vazões por ID do açude:", error);
+    throw new Error(error.response?.data?.message || "Erro ao listar vazões");
+  }
+},
+// Função para editar as vazões
+async editarVazoes(vazoes) {
+  try {
+    // Chama o endpoint PUT para atualizar as vazões no backend
+    const response = await axios.put(`${API_URL_VAZAO}/editarVazoes`, vazoes, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    console.log("Resposta da atualização de vazões:", response.data);
+    return response.data; // Retorna a resposta da API
+  } catch (error) {
+    console.error("Erro ao editar vazões:", error);
+    throw new Error(error.response?.data?.message || "Erro ao editar vazões");
+  }
+}
   
 };
 

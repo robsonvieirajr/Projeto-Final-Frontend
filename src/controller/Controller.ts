@@ -85,6 +85,51 @@ const controller = {
       this.$toast.error("Erro ao salvar os dados de chuva.");
     }
   },
+  // Endpoint para listar as vazões de um açude por ID
+  async listarVazoesPorIdAcude(req, res) {
+    const { id_acude } = req.query;
+    try {
+      const vazoes = await acudeService.listarVazoesPorIdAcude(id_acude);
+      return res.status(200).json({
+        codigoMensagem: 0,
+        mensagem: "Operação realizada com sucesso!",
+        objeto: vazoes,
+        dataServidor: new Date().toISOString(),
+      });
+    } catch (error) {
+      return res.status(500).json({
+        codigoMensagem: 1,
+        mensagem: "Erro ao listar vazões",
+        error: error.message,
+      });
+    }
+  },
+  // Controller para realizar a atualização de vazões
+async editarVazoes(req, res) {
+  try {
+    const vazoes = req.body; // Recebe a lista de vazões que serão atualizadas
+    console.log("Dados recebidos para atualização:", vazoes);
+
+    // Chama o serviço que faz a atualização das vazões no backend
+    await acudeService.editarVazoes(vazoes);
+
+    // Retorna uma resposta de sucesso
+    return res.status(200).json({
+      codigoMensagem: 0,
+      mensagem: "Vazões atualizadas com sucesso!",
+    });
+  } catch (error) {
+    console.error("Erro ao editar vazões:", error);
+
+    // Retorna uma resposta de erro
+    return res.status(500).json({
+      codigoMensagem: 1,
+      mensagem: "Erro ao atualizar vazões",
+      error: error.message,
+    });
+  }
+}
+
 }
 
 export default controller;

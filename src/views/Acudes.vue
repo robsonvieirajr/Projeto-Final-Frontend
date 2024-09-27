@@ -8,6 +8,42 @@
           <v-btn class="btn-rounded btn-primary" @click="abrirModal">Cadastrar Açudes</v-btn>
         </div>
 
+     <!-- Modal para listar vazão -->
+     <v-dialog v-model="dialog" max-width="700px" class="custom-dialog">
+  <v-card class="custom-card">
+    <!-- Título centralizado -->
+    <v-card-title class="headline custom-card-title" style="text-align: center;">
+      Dados de Vazão:  Ano {{ anoVazao }}
+    </v-card-title>
+
+    <v-card-text>
+      <v-form>
+        <v-container>
+          <!-- Loop para exibir os meses e campos de vazão -->
+          <v-row v-for="(vazao, index) in vazoes" :key="index" class="py-2">
+            <v-col cols="4">
+              <v-text-field v-model="vazao.mesVazao" label="Mês" readonly></v-text-field>
+            </v-col>
+            <v-col cols="8">
+              <v-text-field v-model="vazao.valorVazao" label="Valor da Vazão (m³)"></v-text-field>
+            </v-col>
+          </v-row>
+        </v-container>
+      </v-form>
+    </v-card-text>
+
+    <v-card-actions>
+      <v-spacer></v-spacer>
+      <v-btn class="btn-rounded btn-outline" @click="fecharModalVazao">Cancelar</v-btn>
+      <v-btn class="btn-rounded btn-primary" @click="salvarVazao">Salvar</v-btn>
+    </v-card-actions>
+  </v-card>
+</v-dialog>
+
+
+
+
+
         <!-- Modal para cadastrar açudes -->
         <v-dialog v-model="dialogo" max-width="800px" class="custom-dialog">
           <v-card class="custom-card">
@@ -274,7 +310,7 @@
                   </td>
                   <td class="text-center">
                     <v-icon small @click="handleClick('chuva', item)" color="blue">mdi-weather-rainy</v-icon>
-                    <v-icon small @click="handleClick('vazao', item)" color="blue">mdi-waves</v-icon>
+                    <v-icon small @click="abreModalVazao('vazao', item)" color="blue">mdi-waves</v-icon>
                     <v-icon small @click="handleClick('evaporacao', item)" color="blue">mdi-thermometer</v-icon>
                     <div class="icon-cav" @click="handleClick('cotaAreaVolume', item)">
                       CAV
@@ -1961,6 +1997,9 @@ export default {
       ],
 
       dialogo: false,
+      dialog: false, // Controla o modal de vazão
+      vazoes: [], // Aqui serão armazenados os dados de vazão por mês
+      anoVazao: "", // Armazena o ano para exibição
       dialogoChuvaImportada: false, // controla o modal de chuva importada
       dialogoChuva: false,
       dialogoSucesso: false,
@@ -2081,8 +2120,66 @@ export default {
   }
 },
 
+async buscarVazao(idAcude) {
+    try {
+      const response = await acudeService.listarVazoesPorIdAcude(idAcude);
+      if (response && response.objeto) {
+        this.vazoes = response.objeto; // Armazena os dados de vazão retornados
+        if (response.objeto.length > 0) {
+          this.anoVazao = response.objeto[0].anoVazao; // Definindo o ano para exibir
+        }
+        console.log('Dados de vazão recebidos:', this.vazoes);
+      } else {
+        console.error("Nenhuma vazão encontrada.");
+      }
+    } catch (error) {
+      console.error("Erro ao buscar dados de vazão:", error);
+    }
+  },
+  async salvarVazao() {
+  try {
+    // Prepara os dados das vazões para enviar ao backend
+    const dadosParaSalvar = this.vazoes.map(vazao => ({
+      id: vazao.id,
+      id_acude: vazao.id_acude,
+      valorVazao: parseFloat(vazao.valorVazao) || 0, // Garante que o valor seja numérico
+      mesVazao: vazao.mesVazao,
+      anoVazao: vazao.anoVazao,
+    }));
 
-    atualizarPosto() {
+    // Verifica os dados que serão enviados ao backend
+    console.log("Dados para salvar:", dadosParaSalvar);
+
+    // Chama o serviço que faz a atualização
+    await acudeService.editarVazoes(dadosParaSalvar);
+
+    // Exibe o Snackbar personalizado com a mensagem de sucesso
+    this.snackbarMessage = "Dados de vazão salvo com sucesso!";
+    this.snackbar = true;
+
+        // Fecha o modal após salvar
+    this.dialog = false;
+
+    // Garante que o modal seja fechado forçando atualização da interface
+    await this.$nextTick();  // Espera até que o DOM seja atualizado antes de forçar a atualização
+
+    // Força a atualização da interface para garantir que o modal feche
+    this.$forceUpdate();
+
+  } catch (error) {
+    console.error("Erro ao salvar as vazões:", error);
+
+    // Tratamento para exibir uma mensagem de erro
+    if (error.response && error.response.data && error.response.data.message) {
+      this.$toast.error(error.response.data.message);
+    } else {
+      this.$toast.error("Erro ao salvar as vazões.");
+    }
+  }
+},
+
+
+atualizarPosto() {
       console.log("Município selecionado:", this.dadosChuva.municipio);
       console.log("Lista de municípios:", this.municipiosPostos);
 
@@ -2117,19 +2214,29 @@ export default {
     },
 
     handleClick(acao, item) {
-      if (acao === "chuva") {
+  if (acao === "chuva") {
         this.dialogoChuva = true; // Abre o modal
         this.dadosChuva.municipio = item.municipio; // Preenche o município com o valor do item
-        this.idAcude = item.id; // Captura o ID do açude
+    this.idAcude = item.id; // Captura o ID do açude
 
         // Adiciona o ID do açude na URL
-        const url = new URL(window.location.href);
-        url.searchParams.set('idAcude', this.idAcude);
+    const url = new URL(window.location.href);
+    url.searchParams.set('idAcude', this.idAcude);
         window.history.pushState({}, '', url); // Atualiza a URL sem recarregar a página
 
         this.atualizarPosto(); // Atualiza a estação pluviométrica com base no município selecionado
-      }
-    },
+  }
+},
+ // Função que abre o modal e busca os dados de vazão
+ abreModalVazao(acao, item) {
+  if (acao === 'vazao') {
+    console.log('Abrindo modal de vazão para o açude ID:', item.id);
+    this.dialog = true; // Abre o modal de vazão
+    console.log('Valor de dialog após abrir modal:', this.dialog);
+    this.buscarVazao(item.id); // Chama a função para buscar os dados de vazão
+  }
+},
+
 
     async salvarDadosChuva() {
   // Verifique se há dados para salvar
@@ -2226,6 +2333,10 @@ export default {
     abrirModal() {
       this.dialogo = true;
     },
+    fecharModalVazao() {
+  this.dialog = false; // Controla o fechamento do modal de vazão
+  this.vazoes = [];    // Limpa os dados de vazões
+},
     fecharModal() {
       this.dialogo = false;
       this.novoAcude = {
