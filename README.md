@@ -1,54 +1,36 @@
-#Vue 3 Com Vuetify e 3 projetos.
+
+# Projeto final da PÓS-GRADUAÇÃO EM DESENVOLVIMENTO WEB FULL STACK
+# * Frontend
+
+O Projeto consiste na criação de um sistema web voltado o cálculo automático de Dimensionamento e Balanço Hídrico de Açudes.
+
+## 📁 Acesso ao projeto
+**Efetue o download do projeto ou o clone do projeto - [aqui](https://github.com/robsonvieirajr/Projeto-Final-Frontend)** 
 
 
-## Project setup
+## 🛠️ Instalação
+- Necessário ter o node instalado
+Execute o comando:
 
+```bash
+    npm install
+    npm run dev
 ```
-# yarn
-yarn
+    
+## Demonstração
 
-# npm
-npm install
+- Demostração do sistema no [Figma](https://www.figma.com/proto/MhfBR5tnD7IwEcV1pH0ggi/DAA?node-id=68-983&node-type=canvas&t=B6FbNGeQFSfEVasN-1&scaling=contain&content-scaling=fixed&page-id=0%3A1&starting-point-node-id=1%3A2)
 
-# pnpm
-pnpm install
+- Documentação do [Sistema](https://1drv.ms/w/s!AoXH7aw90ht9jIhf9HGBhyRcEU_yfg?e=gmiT4M)
 
-# bun
-bun install
-```
+- Apresentação do [Sistema](https://github.com/user-attachments/files/16934110/DAA.-.Apresentacao.pptx)
 
-### Compiles and hot-reloads for development
 
-```
-# yarn
-yarn dev
 
-# npm
-npm run dev
 
-# pnpm
-pnpm dev
 
-# bun
-bun run dev
-```
+## Autores
 
-### Compiles and minifies for production
+- [Robson Vieira Cavalcanti Júnior](https://www.github.com/robsonvieirajr)
+- [Diego Magno Tavares da Silva](https://github.com/diojp)
 
-```
-# yarn
-yarn build
-
-# npm
-npm run build
-
-# pnpm
-pnpm build
-
-# bun
-bun run build
-```
-
-### Customize configuration
-
-See [Configuration Reference](https://vitejs.dev/config/).
